@@ -115,5 +115,9 @@ namespace NetCoreServer
 		/// Option: send buffer size
 		/// </summary>
 		public int OptionSendBufferSize { get; set; }
+
+		bool Start();
+		bool Stop();
+		bool Restart();
 	}
 }
