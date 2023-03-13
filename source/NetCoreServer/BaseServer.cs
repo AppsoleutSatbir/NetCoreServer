@@ -126,6 +126,7 @@ namespace NetCoreServer
 		public BaseServer(EndPoint endpoint, string address, int port)
 		{
 			Id = Guid.NewGuid();
+			Endpoint = endpoint;
 			Address = address;
 			Port = port;
 		}
