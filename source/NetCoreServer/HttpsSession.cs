@@ -13,7 +13,7 @@ namespace NetCoreServer
 			Cache = server.Cache;
 			Request = new HttpRequest();
 			Response = new HttpResponse();
-			Initialize(server);
+			Initialize(server, null);
 		}
 
 		/// <summary>

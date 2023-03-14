@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.SocketServerCore.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,6 +15,8 @@ namespace NetCoreServer
 	public abstract class BaseServer<SESSION_TYPE> : IBaseServer, IDisposable
 		where SESSION_TYPE : BaseSession, new()
 	{
+
+		protected ILogger Logger { get; }
 
 		/// <summary>
 		/// Server Id
@@ -123,8 +126,9 @@ namespace NetCoreServer
 		/// </summary>
 		public int OptionSendBufferSize { get; set; } = 8192;
 
-		public BaseServer(EndPoint endpoint, string address, int port)
+		public BaseServer(ILogger a_logger, EndPoint endpoint, string address, int port)
 		{
+			Logger = a_logger;
 			Id = Guid.NewGuid();
 			Endpoint = endpoint;
 			Address = address;
@@ -372,6 +376,7 @@ namespace NetCoreServer
 		{
 			// Register a new session
 			Sessions.TryAdd(a_session.Id, a_session);
+			Logger.Debug("Registered new session {CLIENT_SESSION_ID}, NewCount: {SESSION_COUNT} ", a_session.Id, Sessions.Count);
 		}
 
 		/// <summary>
@@ -382,6 +387,7 @@ namespace NetCoreServer
 		{
 			// Unregister session by Id
 			Sessions.TryRemove(id, out SESSION_TYPE _);
+			Logger.Debug("Unregistered session {CLIENT_SESSION_ID}, RemainingCount: {SESSION_COUNT} ", id, Sessions.Count);
 		}
 
 		#endregion
@@ -440,7 +446,6 @@ namespace NetCoreServer
 		public virtual bool Multicast(ReadOnlySpan<char> text) => Multicast(Encoding.UTF8.GetBytes(text.ToArray()));
 
 		#endregion
-
 
 		#region Server handlers
 

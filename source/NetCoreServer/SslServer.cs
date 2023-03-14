@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.SocketServerCore.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
@@ -20,26 +21,26 @@ namespace NetCoreServer
 		/// <param name="context">SSL context</param>
 		/// <param name="address">IP address</param>
 		/// <param name="port">Port number</param>
-		public SslServer(SslContext context, IPAddress address, int port) : this(context, new IPEndPoint(address, port)) { }
+		public SslServer(ILogger a_logger, SslContext context, IPAddress address, int port) : this(a_logger, context, new IPEndPoint(address, port)) { }
 		/// <summary>
 		/// Initialize SSL server with a given IP address and port number
 		/// </summary>
 		/// <param name="context">SSL context</param>
 		/// <param name="address">IP address</param>
 		/// <param name="port">Port number</param>
-		public SslServer(SslContext context, string address, int port) : this(context, new IPEndPoint(IPAddress.Parse(address), port)) { }
+		public SslServer(ILogger a_logger, SslContext context, string address, int port) : this(a_logger, context, new IPEndPoint(IPAddress.Parse(address), port)) { }
 		/// <summary>
 		/// Initialize SSL server with a given DNS endpoint
 		/// </summary>
 		/// <param name="context">SSL context</param>
 		/// <param name="endpoint">DNS endpoint</param>
-		public SslServer(SslContext context, DnsEndPoint endpoint) : this(context, endpoint as EndPoint, endpoint.Host, endpoint.Port) { }
+		public SslServer(ILogger a_logger, SslContext context, DnsEndPoint endpoint) : this(a_logger, context, endpoint as EndPoint, endpoint.Host, endpoint.Port) { }
 		/// <summary>
 		/// Initialize SSL server with a given IP endpoint
 		/// </summary>
 		/// <param name="context">SSL context</param>
 		/// <param name="endpoint">IP endpoint</param>
-		public SslServer(SslContext context, IPEndPoint endpoint) : this(context, endpoint as EndPoint, endpoint.Address.ToString(), endpoint.Port) { }
+		public SslServer(ILogger a_logger, SslContext context, IPEndPoint endpoint) : this(a_logger, context, endpoint as EndPoint, endpoint.Address.ToString(), endpoint.Port) { }
 		/// <summary>
 		/// Initialize SSL server with a given SSL context, endpoint, address and port
 		/// </summary>
@@ -47,7 +48,7 @@ namespace NetCoreServer
 		/// <param name="endpoint">Endpoint</param>
 		/// <param name="address">Server address</param>
 		/// <param name="port">Server port</param>
-		private SslServer(SslContext context, EndPoint endpoint, string address, int port) : base(endpoint, address, port)
+		private SslServer(ILogger a_logger, SslContext context, EndPoint endpoint, string address, int port) : base(a_logger, endpoint, address, port)
 		{
 			Context = context;
 		}
@@ -101,8 +102,9 @@ namespace NetCoreServer
 		/// <returns>SSL session</returns>
 		protected override SslSession CreateSession()
 		{
+			Logger.Debug("Creating new session");
 			SslSession l_session = new SslSession();
-			l_session.Initialize(this);
+			l_session.Initialize(this, Logger);
 			return l_session;
 		}
 
@@ -123,12 +125,12 @@ namespace NetCoreServer
 		/// Handle session handshaking notification
 		/// </summary>
 		/// <param name="session">Handshaking session</param>
-		protected virtual void OnHandshaking(SslSession session) { }
+		protected virtual void OnHandshaking(SslSession session) { Console.WriteLine("Handshaking"); }
 		/// <summary>
 		/// Handle session handshaked notification
 		/// </summary>
 		/// <param name="session">Handshaked session</param>
-		protected virtual void OnHandshaked(SslSession session) { }
+		protected virtual void OnHandshaked(SslSession session) { Console.WriteLine("OnHandshaked"); }
 
 		#endregion
 

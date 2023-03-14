@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.SocketServerCore.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
@@ -19,30 +20,30 @@ namespace NetCoreServer
 		/// </summary>
 		/// <param name="address">IP address</param>
 		/// <param name="port">Port number</param>
-		public TcpServer(IPAddress address, int port) : this(new IPEndPoint(address, port)) { }
+		public TcpServer(ILogger a_logger, IPAddress address, int port) : this(a_logger, new IPEndPoint(address, port)) { }
 		/// <summary>
 		/// Initialize TCP server with a given IP address and port number
 		/// </summary>
 		/// <param name="address">IP address</param>
 		/// <param name="port">Port number</param>
-		public TcpServer(string address, int port) : this(new IPEndPoint(IPAddress.Parse(address), port)) { }
+		public TcpServer(ILogger a_logger, string address, int port) : this(a_logger, new IPEndPoint(IPAddress.Parse(address), port)) { }
 		/// <summary>
 		/// Initialize TCP server with a given DNS endpoint
 		/// </summary>
 		/// <param name="endpoint">DNS endpoint</param>
-		public TcpServer(DnsEndPoint endpoint) : this(endpoint as EndPoint, endpoint.Host, endpoint.Port) { }
+		public TcpServer(ILogger a_logger, DnsEndPoint endpoint) : this(a_logger, endpoint as EndPoint, endpoint.Host, endpoint.Port) { }
 		/// <summary>
 		/// Initialize TCP server with a given IP endpoint
 		/// </summary>
 		/// <param name="endpoint">IP endpoint</param>
-		public TcpServer(IPEndPoint endpoint) : this(endpoint as EndPoint, endpoint.Address.ToString(), endpoint.Port) { }
+		public TcpServer(ILogger a_logger, IPEndPoint endpoint) : this(a_logger, endpoint as EndPoint, endpoint.Address.ToString(), endpoint.Port) { }
 		/// <summary>
 		/// Initialize TCP server with a given endpoint, address and port
 		/// </summary>
 		/// <param name="endpoint">Endpoint</param>
 		/// <param name="address">Server address</param>
 		/// <param name="port">Server port</param>
-		private TcpServer(EndPoint endpoint, string address, int port) : base(endpoint, address, port)
+		private TcpServer(ILogger a_logger, EndPoint endpoint, string address, int port) : base(a_logger, endpoint, address, port)
 		{
 		}
 
@@ -91,8 +92,9 @@ namespace NetCoreServer
 		/// <returns>TCP session</returns>
 		protected override TcpSession CreateSession()
 		{
+			Logger.Debug("Creating new session");
 			TcpSession l_session = new TcpSession();
-			l_session.Initialize(this);
+			l_session.Initialize(this, Logger);
 			return l_session;
 		}
 

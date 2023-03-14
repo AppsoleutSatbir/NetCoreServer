@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.SocketServerCore.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -10,6 +11,8 @@ namespace NetCoreServer
 	public class BaseSession : IBaseSession
 	{
 		public IBaseServer ServerRef { get; private set; }
+
+		protected ILogger Logger { get; private set; }
 
 		/// <summary>
 		/// Session Id
@@ -60,9 +63,10 @@ namespace NetCoreServer
 			Id = Guid.NewGuid();
 		}
 
-		internal void Initialize(IBaseServer a_serverRef)
+		internal void Initialize(IBaseServer a_serverRef, ILogger a_logger)
 		{
 			ServerRef = a_serverRef;
+			Logger = a_logger;
 			OptionReceiveBufferSize = a_serverRef.OptionReceiveBufferSize;
 			OptionSendBufferSize = a_serverRef.OptionSendBufferSize;
 		}
@@ -285,7 +289,7 @@ namespace NetCoreServer
 		/// Handle error notification
 		/// </summary>
 		/// <param name="error">Socket error code</param>
-		protected virtual void OnError(SocketError error) { }
+		protected virtual void OnError(SocketError error, Exception a_ex) { }
 		#endregion
 
 		#region Error handling
@@ -294,7 +298,7 @@ namespace NetCoreServer
 		/// Send error notification
 		/// </summary>
 		/// <param name="error">Socket error code</param>
-		protected void SendError(SocketError error)
+		protected void SendError(SocketError error, Exception a_ex = null)
 		{
 			// Skip disconnect errors
 			if ((error == SocketError.ConnectionAborted) ||
@@ -304,7 +308,7 @@ namespace NetCoreServer
 				(error == SocketError.Shutdown))
 				return;
 
-			OnError(error);
+			OnError(error, a_ex);
 		}
 
 		#endregion

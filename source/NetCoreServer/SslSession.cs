@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.SocketServerCore.Logging;
+using System;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
@@ -79,6 +80,7 @@ namespace NetCoreServer
 
 			// Call the session connecting handler
 			OnConnecting();
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Connecting.", Id);
 
 			// Call the session connecting handler in the server
 			Server.OnConnectingInternal(this);
@@ -88,6 +90,8 @@ namespace NetCoreServer
 
 			// Call the session connected handler
 			OnConnected();
+
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Connected.", Id);
 
 			// Call the session connected handler in the server
 			Server.OnConnectedInternal(this);
@@ -100,6 +104,7 @@ namespace NetCoreServer
 
 				// Call the session handshaking handler
 				OnHandshaking();
+				Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Handshaking.", Id);
 
 				// Call the session handshaking handler in the server
 				Server.OnHandshakingInternal(this);
@@ -107,9 +112,9 @@ namespace NetCoreServer
 				// Begin the SSL handshake
 				_sslStream.BeginAuthenticateAsServer(Server.Context.Certificate, Server.Context.ClientCertificateRequired, Server.Context.Protocols, false, ProcessHandshake, _sslStreamId);
 			}
-			catch (Exception)
+			catch (Exception a_ex)
 			{
-				SendError(SocketError.NotConnected);
+				SendError(SocketError.NotConnected, a_ex);
 				Disconnect();
 			}
 		}
@@ -131,6 +136,7 @@ namespace NetCoreServer
 
 			// Call the session disconnecting handler
 			OnDisconnecting();
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
 
 			// Call the session disconnecting handler in the server
 			Server.OnDisconnectingInternal(this);
@@ -184,6 +190,7 @@ namespace NetCoreServer
 
 			// Call the session disconnected handler in the server
 			Server.OnDisconnectedInternal(this);
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
 
 			// Unregister session
 			Server.UnregisterSession(Id);
@@ -227,9 +234,9 @@ namespace NetCoreServer
 
 				return sent;
 			}
-			catch (Exception)
+			catch (Exception a_ex)
 			{
-				SendError(SocketError.OperationAborted);
+				SendError(SocketError.OperationAborted, a_ex);
 				Disconnect();
 				return 0;
 			}
@@ -307,12 +314,17 @@ namespace NetCoreServer
 
 				return received;
 			}
-			catch (Exception)
+			catch (Exception a_ex)
 			{
-				SendError(SocketError.OperationAborted);
+				SendError(SocketError.OperationAborted, a_ex);
 				Disconnect();
 				return 0;
 			}
+		}
+
+		protected override void OnReceived(byte[] buffer, long offset, long size)
+		{
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
 		}
 
 		/// <summary>
@@ -428,6 +440,7 @@ namespace NetCoreServer
 
 				// Call the session handshaked handler
 				OnHandshaked();
+				Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Handshake finished.", Id);
 
 				// Call the session handshaked handler in the server
 				Server.OnHandshakedInternal(this);
@@ -436,9 +449,9 @@ namespace NetCoreServer
 				if (_sendBufferMain.IsEmpty)
 					OnEmpty();
 			}
-			catch (Exception)
+			catch (Exception a_ex)
 			{
-				SendError(SocketError.NotConnected);
+				SendError(SocketError.NotConnected, a_ex);
 				Disconnect();
 			}
 		}
@@ -497,9 +510,9 @@ namespace NetCoreServer
 				else
 					Disconnect();
 			}
-			catch (Exception)
+			catch (Exception a_ex)
 			{
-				SendError(SocketError.OperationAborted);
+				SendError(SocketError.OperationAborted, a_ex);
 				Disconnect();
 			}
 		}
@@ -550,9 +563,9 @@ namespace NetCoreServer
 				// Try to send again if the session is valid
 				TrySend();
 			}
-			catch (Exception)
+			catch (Exception a_ex)
 			{
-				SendError(SocketError.OperationAborted);
+				SendError(SocketError.OperationAborted, a_ex);
 				Disconnect();
 			}
 		}

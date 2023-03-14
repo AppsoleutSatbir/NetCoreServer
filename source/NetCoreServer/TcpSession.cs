@@ -1,3 +1,4 @@
+using AC.SocketServerCore.Logging;
 using System;
 using System.Net.Sockets;
 using System.Text;
@@ -75,6 +76,7 @@ namespace NetCoreServer
 
 			// Call the session connecting handler
 			OnConnecting();
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Connecting.", Id);
 
 			// Call the session connecting handler in the server
 			Server.OnConnectingInternal(this);
@@ -91,6 +93,7 @@ namespace NetCoreServer
 
 			// Call the session connected handler
 			OnConnected();
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Connected.", Id);
 
 			// Call the session connected handler in the server
 			Server.OnConnectedInternal(this);
@@ -115,6 +118,7 @@ namespace NetCoreServer
 
 			// Call the session disconnecting handler
 			OnDisconnecting();
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
 
 			// Call the session disconnecting handler in the server
 			Server.OnDisconnectingInternal(this);
@@ -158,6 +162,7 @@ namespace NetCoreServer
 
 			// Call the session disconnected handler in the server
 			Server.OnDisconnectedInternal(this);
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
 
 			// Unregister session
 			Server.UnregisterSession(Id);
@@ -281,6 +286,11 @@ namespace NetCoreServer
 			}
 
 			return received;
+		}
+
+		protected override void OnReceived(byte[] buffer, long offset, long size)
+		{
+			Logger.Debug("Client{CLIENT_SESSION_ID}::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
 		}
 
 		/// <summary>
