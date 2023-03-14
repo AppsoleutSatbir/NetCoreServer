@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
-	public abstract class BaseServer<SESSION_TYPE> : IBaseServer, IDisposable
+	public abstract class BaseServer<SESSION_TYPE> : IBaseServer, IBaseServer<SESSION_TYPE>, IDisposable
 		where SESSION_TYPE : BaseSession, new()
 	{
 
@@ -306,7 +306,7 @@ namespace NetCoreServer
 				session.Connect(e.AcceptSocket);
 			}
 			else
-				SendError(e.SocketError);
+				SendError(e.SocketError, e.ConnectByNameError);
 
 			// Accept the next client connection
 			if (IsAccepting)
@@ -449,22 +449,45 @@ namespace NetCoreServer
 
 		#region Server handlers
 
+		public event Action Event_OnStarting;
+		public event Action Event_OnStarted;
+		public event Action Event_OnStopping;
+		public event Action Event_OnStopped;
+
+		public event Action<SESSION_TYPE> Event_OnConnecting;
+		public event Action<SESSION_TYPE> Event_OnConnected;
+		public event Action<SESSION_TYPE> Event_OnDisconnecting;
+		public event Action<SESSION_TYPE> Event_OnDisconnected;
+		public event Action<SocketError, Exception> Event_OnError;
+
 		/// <summary>
 		/// Handle server starting notification
 		/// </summary>
-		protected virtual void OnStarting() { }
+		protected virtual void OnStarting()
+		{
+			Event_OnStarting?.Invoke();
+		}
 		/// <summary>
 		/// Handle server started notification
 		/// </summary>
-		protected virtual void OnStarted() { }
+		protected virtual void OnStarted()
+		{
+			Event_OnStarted?.Invoke();
+		}
 		/// <summary>
 		/// Handle server stopping notification
 		/// </summary>
-		protected virtual void OnStopping() { }
+		protected virtual void OnStopping()
+		{
+			Event_OnStopping?.Invoke();
+		}
 		/// <summary>
 		/// Handle server stopped notification
 		/// </summary>
-		protected virtual void OnStopped() { }
+		protected virtual void OnStopped()
+		{
+			Event_OnStopped?.Invoke();
+		}
 
 		/// <summary>
 		/// Handle session connecting notification
@@ -491,12 +514,28 @@ namespace NetCoreServer
 		/// Handle error notification
 		/// </summary>
 		/// <param name="error">Socket error code</param>
-		protected virtual void OnError(SocketError error) { }
+		protected virtual void OnError(SocketError error, Exception a_ex) { }
 
-		internal void OnConnectingInternal(SESSION_TYPE session) { OnConnecting(session); }
-		internal void OnConnectedInternal(SESSION_TYPE session) { OnConnected(session); }
-		internal void OnDisconnectingInternal(SESSION_TYPE session) { OnDisconnecting(session); }
-		internal void OnDisconnectedInternal(SESSION_TYPE session) { OnDisconnected(session); }
+		internal void OnConnectingInternal(SESSION_TYPE session)
+		{
+			Event_OnConnecting?.Invoke(session);
+			OnConnecting(session);
+		}
+		internal void OnConnectedInternal(SESSION_TYPE session)
+		{
+			Event_OnConnected?.Invoke(session);
+			OnConnected(session);
+		}
+		internal void OnDisconnectingInternal(SESSION_TYPE session)
+		{
+			Event_OnDisconnecting?.Invoke(session);
+			OnDisconnecting(session);
+		}
+		internal void OnDisconnectedInternal(SESSION_TYPE session)
+		{
+			Event_OnDisconnected?.Invoke(session);
+			OnDisconnected(session);
+		}
 
 		#endregion
 
@@ -505,7 +544,7 @@ namespace NetCoreServer
 		/// Send error notification
 		/// </summary>
 		/// <param name="error">Socket error code</param>
-		private void SendError(SocketError error)
+		private void SendError(SocketError error, Exception a_ex)
 		{
 			// Skip disconnect errors
 			if ((error == SocketError.ConnectionAborted) ||
@@ -515,7 +554,7 @@ namespace NetCoreServer
 				(error == SocketError.Shutdown))
 				return;
 
-			OnError(error);
+			OnError(error, a_ex);
 		}
 		#endregion
 

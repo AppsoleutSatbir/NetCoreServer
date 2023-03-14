@@ -2,11 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
+	public interface IBaseServer<SESSION_TYPE> : IBaseServer where SESSION_TYPE : BaseSession
+	{
+		public event Action<SESSION_TYPE> Event_OnConnecting;
+		public event Action<SESSION_TYPE> Event_OnConnected;
+		public event Action<SESSION_TYPE> Event_OnDisconnecting;
+		public event Action<SESSION_TYPE> Event_OnDisconnected;
+	}
+
 	public interface IBaseServer : IDisposable
 	{
 		/// <summary>
@@ -115,6 +124,16 @@ namespace NetCoreServer
 		/// Option: send buffer size
 		/// </summary>
 		public int OptionSendBufferSize { get; set; }
+
+
+		public event Action Event_OnStarting;
+		public event Action Event_OnStarted;
+		public event Action Event_OnStopping;
+		public event Action Event_OnStopped;
+
+		public event Action<SocketError, Exception> Event_OnError;
+		//public event Action<byte[], long, long> Event_OnReceivedData;
+		//public event Action<long, long> Event_OnSentData;
 
 		bool Start();
 		bool Stop();
