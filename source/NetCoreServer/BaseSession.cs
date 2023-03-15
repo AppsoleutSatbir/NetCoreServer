@@ -1,10 +1,7 @@
 ﻿using AC.SocketServerCore.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
@@ -237,6 +234,8 @@ namespace NetCoreServer
 		#endregion
 
 		#region Session handlers
+		public event Action<IBaseSession, byte[], long, long> Event_OnReceived;
+		public event Action<IBaseSession, long, long> Event_OnSent;
 
 		/// <summary>
 		/// Handle client connecting notification
@@ -264,7 +263,11 @@ namespace NetCoreServer
 		/// <remarks>
 		/// Notification is called when another chunk of buffer was received from the client
 		/// </remarks>
-		protected virtual void OnReceived(byte[] buffer, long offset, long size) { }
+		protected virtual void OnReceived(byte[] buffer, long offset, long size)
+		{
+			Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
+			Event_OnReceived?.Invoke(this, buffer, offset, size);
+		}
 		/// <summary>
 		/// Handle buffer sent notification
 		/// </summary>
@@ -274,7 +277,11 @@ namespace NetCoreServer
 		/// Notification is called when another chunk of buffer was sent to the client.
 		/// This handler could be used to send another buffer to the client for instance when the pending size is zero.
 		/// </remarks>
-		protected virtual void OnSent(long sent, long pending) { }
+		protected virtual void OnSent(long sent, long pending)
+		{
+			Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnSent:: Sent: {sent}, Pending: {pending}", Id, sent, pending);
+			Event_OnSent?.Invoke(this, sent, pending);
+		}
 
 		/// <summary>
 		/// Handle empty send buffer notification
@@ -307,6 +314,9 @@ namespace NetCoreServer
 				(error == SocketError.OperationAborted) ||
 				(error == SocketError.Shutdown))
 				return;
+
+			if (a_ex != null)
+				Logger.Error(a_ex);
 
 			OnError(error, a_ex);
 		}

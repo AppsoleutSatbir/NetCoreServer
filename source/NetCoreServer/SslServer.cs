@@ -125,12 +125,12 @@ namespace NetCoreServer
 		/// Handle session handshaking notification
 		/// </summary>
 		/// <param name="session">Handshaking session</param>
-		protected virtual void OnHandshaking(SslSession session) { Console.WriteLine("Handshaking"); }
+		protected virtual void OnHandshaking(SslSession session) { Logger.Verbose("SslServer::Handshaking"); }
 		/// <summary>
 		/// Handle session handshaked notification
 		/// </summary>
 		/// <param name="session">Handshaked session</param>
-		protected virtual void OnHandshaked(SslSession session) { Console.WriteLine("OnHandshaked"); }
+		protected virtual void OnHandshaked(SslSession session) { Logger.Verbose("SslServer::OnHandshaked"); }
 
 		#endregion
 

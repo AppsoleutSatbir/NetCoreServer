@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
-	internal interface IBaseSession
+	public interface IBaseSession
 	{
 		IBaseServer ServerRef { get; }
 
@@ -76,6 +72,11 @@ namespace NetCoreServer
 		long Receive(byte[] buffer);
 		long Receive(byte[] buffer, long offset, long size);
 		string Receive(long size);
+		#endregion
+
+		#region Session handlers
+		public event Action<IBaseSession, byte[], long, long> Event_OnReceived;
+		public event Action<IBaseSession, long, long> Event_OnSent;
 		#endregion
 	}
 }

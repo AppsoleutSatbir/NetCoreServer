@@ -288,11 +288,6 @@ namespace NetCoreServer
 			return received;
 		}
 
-		protected override void OnReceived(byte[] buffer, long offset, long size)
-		{
-			Logger.Debug("Client{CLIENT_SESSION_ID}::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
-		}
-
 		/// <summary>
 		/// Try to receive new data
 		/// </summary>

@@ -114,6 +114,7 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
+				Logger.Error(a_ex);
 				SendError(SocketError.NotConnected, a_ex);
 				Disconnect();
 			}
@@ -148,7 +149,10 @@ namespace NetCoreServer
 					// Shutdown the SSL stream
 					_sslStream.ShutdownAsync().Wait();
 				}
-				catch (Exception) { }
+				catch (Exception a_ex)
+				{
+					Logger.Error(a_ex);
+				}
 
 				// Dispose the SSL stream & buffer
 				_sslStream.Dispose();
@@ -159,7 +163,10 @@ namespace NetCoreServer
 					// Shutdown the socket associated with the client
 					Socket.Shutdown(SocketShutdown.Both);
 				}
-				catch (SocketException) { }
+				catch (SocketException a_ex)
+				{
+					Logger.Error(a_ex);
+				}
 
 				// Close the session socket
 				Socket.Close();
@@ -170,7 +177,10 @@ namespace NetCoreServer
 				// Update the session socket disposed flag
 				IsSocketDisposed = true;
 			}
-			catch (ObjectDisposedException) { }
+			catch (ObjectDisposedException a_ex)
+			{
+				Logger.Error(a_ex);
+			}
 
 			// Update the handshaked flag
 			IsHandshaked = false;
@@ -237,7 +247,8 @@ namespace NetCoreServer
 			catch (Exception a_ex)
 			{
 				SendError(SocketError.OperationAborted, a_ex);
-				Disconnect();
+				//Satbir
+				//Disconnect();
 				return 0;
 			}
 		}
@@ -316,15 +327,12 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
+				Logger.Error(a_ex);
 				SendError(SocketError.OperationAborted, a_ex);
-				Disconnect();
+				//Satbir:
+				//Disconnect();
 				return 0;
 			}
-		}
-
-		protected override void OnReceived(byte[] buffer, long offset, long size)
-		{
-			Logger.Debug("Client[{CLIENT_SESSION_ID}]::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
 		}
 
 		/// <summary>
@@ -351,7 +359,7 @@ namespace NetCoreServer
 					result = _sslStream.BeginRead(_receiveBuffer.Data, 0, (int)_receiveBuffer.Capacity, ProcessReceive, _sslStreamId);
 				} while (result.CompletedSynchronously);
 			}
-			catch (ObjectDisposedException) { }
+			catch (ObjectDisposedException a_ex) { Logger.Error(a_ex); }
 		}
 
 		/// <summary>
@@ -403,7 +411,7 @@ namespace NetCoreServer
 				// Async write with the write handler
 				_sslStream.BeginWrite(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset), ProcessSend, _sslStreamId);
 			}
-			catch (ObjectDisposedException) { }
+			catch (ObjectDisposedException a_ex) { Logger.Error(a_ex); }
 		}
 
 		#endregion
@@ -451,6 +459,7 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
+				Logger.Error(a_ex);
 				SendError(SocketError.NotConnected, a_ex);
 				Disconnect();
 			}
@@ -512,8 +521,10 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
+				Logger.Error(a_ex);
 				SendError(SocketError.OperationAborted, a_ex);
-				Disconnect();
+				//Satbir
+				//Disconnect();
 			}
 		}
 
@@ -565,8 +576,10 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
+				Logger.Error(a_ex);
 				SendError(SocketError.OperationAborted, a_ex);
-				Disconnect();
+				//Satbir
+				//Disconnect();
 			}
 		}
 
