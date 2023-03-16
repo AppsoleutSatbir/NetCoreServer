@@ -490,8 +490,14 @@ namespace NetCoreServer
 					BytesReceived += size;
 					Interlocked.Add(ref Server._bytesReceived, size);
 
-					// Call the buffer received handler
-					OnReceived(_receiveBuffer.Data, 0, size);
+					try
+					{
+						// Call the buffer received handler
+						OnReceived(_receiveBuffer.Data, 0, size);
+					}
+					catch (Exception a_ex) {
+						Logger.Error(a_ex);
+					}
 
 					// If the receive buffer is full increase its size
 					if (_receiveBuffer.Capacity == size)
