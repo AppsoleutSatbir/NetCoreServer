@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NetCoreServer
 {
-	public class BaseSession : IBaseSession
+	public class BaseSession : IBaseSession, IDisposable
 	{
 		public IBaseServer ServerRef { get; private set; }
 
@@ -362,6 +362,10 @@ namespace NetCoreServer
 				{
 					// Dispose managed resources here...
 					Disconnect();
+					Event_OnSent = null;
+					Event_OnReceived = null;
+					ServerRef = null;
+					Logger = null;
 				}
 
 				// Dispose unmanaged resources here...

@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace NetCoreServer
 {
-	public interface IBaseSession
+	public interface IBaseSession : IDisposable
 	{
 		IBaseServer ServerRef { get; }
 
