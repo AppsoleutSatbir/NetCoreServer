@@ -102,7 +102,7 @@ namespace NetCoreServer
 		/// <returns>SSL session</returns>
 		protected override SslSession CreateSession()
 		{
-			Logger.Debug("Creating new session");
+			Logger.Debug("SSLSession::Creating new session");
 			SslSession l_session = new SslSession();
 			l_session.Initialize(this, Logger);
 			return l_session;

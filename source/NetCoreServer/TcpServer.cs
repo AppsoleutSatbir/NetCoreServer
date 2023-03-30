@@ -92,7 +92,7 @@ namespace NetCoreServer
 		/// <returns>TCP session</returns>
 		protected override TcpSession CreateSession()
 		{
-			Logger.Debug("Creating new session");
+			Logger.Debug("TCPSession::Creating new session");
 			TcpSession l_session = new TcpSession();
 			l_session.Initialize(this, Logger);
 			return l_session;
