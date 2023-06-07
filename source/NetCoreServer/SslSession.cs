@@ -29,7 +29,7 @@ namespace NetCoreServer
 
 		#region Connect/Disconnect session
 
-		private bool _disconnecting;
+		private volatile bool _disconnecting;
 		private SslStream _sslStream;
 		private Guid? _sslStreamId;
 
@@ -198,12 +198,13 @@ namespace NetCoreServer
 			// Call the session disconnected handler
 			OnDisconnected();
 
-			// Call the session disconnected handler in the server
-			Server.OnDisconnectedInternal(this);
 			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
 
 			// Unregister session
 			Server.UnregisterSession(Id);
+
+			// Call the session disconnected handler in the server
+			Server.OnDisconnectedInternal(this);
 
 			// Reset the disconnecting flag
 			_disconnecting = false;
