@@ -1,7 +1,5 @@
-using AC.SocketServerCore.Logging;
 using System;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace NetCoreServer

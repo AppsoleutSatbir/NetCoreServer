@@ -1,8 +1,6 @@
-﻿using AC.SocketServerCore.Logging;
-using System;
+﻿using System;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace NetCoreServer
@@ -496,7 +494,8 @@ namespace NetCoreServer
 						// Call the buffer received handler
 						OnReceived(_receiveBuffer.Data, 0, size);
 					}
-					catch (Exception a_ex) {
+					catch (Exception a_ex)
+					{
 						Logger.Error(a_ex);
 					}
 
