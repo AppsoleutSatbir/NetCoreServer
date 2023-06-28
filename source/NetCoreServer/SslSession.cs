@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
@@ -348,7 +349,7 @@ namespace NetCoreServer
 			try
 			{
 				// Async receive with the receive handler
-				IAsyncResult result;
+				IAsyncResult result; 
 				do
 				{
 					if (!IsHandshaked)
@@ -359,6 +360,7 @@ namespace NetCoreServer
 				} while (result.CompletedSynchronously);
 			}
 			catch (ObjectDisposedException a_ex) { Logger.Error(a_ex); }
+			catch(Exception a_ex) { Logger.Error(a_ex); }
 		}
 
 		/// <summary>
@@ -524,6 +526,11 @@ namespace NetCoreServer
 				}
 				else
 					Disconnect();
+			}
+			catch(IOException a_ex)
+			{
+				Logger.Error(a_ex);
+				Disconnect();
 			}
 			catch (Exception a_ex)
 			{

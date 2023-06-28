@@ -156,6 +156,9 @@ namespace NetCoreServer
 		/// </summary>
 		public bool IsAccepting { get; protected set; }
 
+		//public bool IsLogging() { return Logger.IsEnabled(ELogLevel.Verbose); }
+		public bool IsLogging { get; set; }
+
 		/// <summary>
 		/// Create a new socket object
 		/// </summary>

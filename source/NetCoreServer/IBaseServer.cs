@@ -134,7 +134,8 @@ namespace NetCoreServer
 		public event Action<SocketError, Exception> Event_OnError;
 		//public event Action<byte[], long, long> Event_OnReceivedData;
 		//public event Action<long, long> Event_OnSentData;
-
+		//bool IsLogging();
+		bool IsLogging { get; set; }
 		bool Start();
 		bool Stop();
 		bool Restart();
