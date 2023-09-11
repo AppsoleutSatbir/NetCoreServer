@@ -15,6 +15,9 @@ namespace NetCoreServer
 	/// <remarks>Thread-safe</remarks>
 	public class SslServer : BaseServer<SslSession>, IDisposable
 	{
+		public event Action<SslSession> Event_OnHandshaking;
+		public event Action<SslSession> Event_OnHandshaked;
+
 		/// <summary>
 		/// Initialize SSL server with a given IP address and port number
 		/// </summary>
@@ -125,12 +128,12 @@ namespace NetCoreServer
 		/// Handle session handshaking notification
 		/// </summary>
 		/// <param name="session">Handshaking session</param>
-		protected virtual void OnHandshaking(SslSession session) { Logger.Verbose("SslServer::Handshaking"); }
+		protected virtual void OnHandshaking(SslSession session) { Logger.Verbose("SslServer::Handshaking"); Event_OnHandshaking?.Invoke(session); }
 		/// <summary>
 		/// Handle session handshaked notification
 		/// </summary>
 		/// <param name="session">Handshaked session</param>
-		protected virtual void OnHandshaked(SslSession session) { Logger.Verbose("SslServer::OnHandshaked"); }
+		protected virtual void OnHandshaked(SslSession session) { Logger.Verbose("SslServer::OnHandshaked"); Event_OnHandshaked?.Invoke(session); }
 
 		#endregion
 
