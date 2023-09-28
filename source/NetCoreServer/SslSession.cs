@@ -79,7 +79,7 @@ namespace NetCoreServer
 
 			// Call the session connecting handler
 			OnConnecting();
-			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Connecting.", Id);
+			Logger.Debug("Client[{CLIENT_IP}]::[{CLIENT_SESSION_ID}]:: Connecting.", socket.RemoteEndPoint.ToString(), Id);
 
 			// Call the session connecting handler in the server
 			Server.OnConnectingInternal(this);
@@ -349,7 +349,7 @@ namespace NetCoreServer
 			try
 			{
 				// Async receive with the receive handler
-				IAsyncResult result; 
+				IAsyncResult result;
 				do
 				{
 					if (!IsHandshaked)
@@ -360,7 +360,7 @@ namespace NetCoreServer
 				} while (result.CompletedSynchronously);
 			}
 			catch (ObjectDisposedException a_ex) { Logger.Error(a_ex); }
-			catch(Exception a_ex) { Logger.Error(a_ex); }
+			catch (Exception a_ex) { Logger.Error(a_ex); }
 		}
 
 		/// <summary>
@@ -527,7 +527,7 @@ namespace NetCoreServer
 				else
 					Disconnect();
 			}
-			catch(IOException a_ex)
+			catch (IOException a_ex)
 			{
 				Logger.Error(a_ex);
 				Disconnect();
