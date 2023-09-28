@@ -213,7 +213,7 @@ namespace NetCoreServer
 
 		#endregion
 
-		#region Send/Recieve data
+        #region Send/Receive data
 
 		/// <summary>
 		/// Send data to the client (synchronous)
