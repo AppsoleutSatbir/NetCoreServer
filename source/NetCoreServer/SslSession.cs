@@ -213,7 +213,7 @@ namespace NetCoreServer
 
 		#endregion
 
-        #region Send/Receive data
+		#region Send/Receive data
 
 		/// <summary>
 		/// Send data to the client (synchronous)
@@ -478,11 +478,13 @@ namespace NetCoreServer
 
 				// Validate SSL stream Id
 				var sslStreamId = result.AsyncState as Guid?;
+				//if(Logger.IsEnabled(AC.NetCoreServer.Logging.ELogLevel.Verbose)) Logger.Information("SSLSession::ProcessReceive:: SllStreamId: " + sslStreamId);
 				if (_sslStreamId != sslStreamId)
 					return;
 
 				// End the SSL read
 				long size = _sslStream.EndRead(result);
+				//if (Logger.IsEnabled(AC.NetCoreServer.Logging.ELogLevel.Verbose)) Logger.Information("SSLSession::ProcessReceive:{Size}", size);
 
 				// Received some data from the client
 				if (size > 0)
@@ -493,6 +495,7 @@ namespace NetCoreServer
 
 					try
 					{
+						//if (Logger.IsEnabled(AC.NetCoreServer.Logging.ELogLevel.Verbose)) Logger.Information("SSLSession:ProcessReceive:\n----------\n{String}\n----------\n{Bytes}\n--------", Encoding.UTF8.GetString(_receiveBuffer.Data), string.Join(",", _receiveBuffer.Data));
 						// Call the buffer received handler
 						OnReceived(_receiveBuffer.Data, 0, size);
 					}
