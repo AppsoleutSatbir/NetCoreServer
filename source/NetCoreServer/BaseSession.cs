@@ -2,6 +2,7 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
@@ -82,6 +83,10 @@ namespace NetCoreServer
 		public virtual bool Disconnect()
 		{
 			return false;
+		}
+		public virtual async Task<bool> DisconnectAsync()
+		{
+			throw new NotImplementedException();
 		}
 		#endregion
 

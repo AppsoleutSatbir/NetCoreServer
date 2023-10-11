@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
@@ -204,6 +205,98 @@ namespace NetCoreServer
 
 			// Call the session disconnected handler in the server
 			Server.OnDisconnectedInternal(this);
+
+			// Reset the disconnecting flag
+			_disconnecting = false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Disconnect the session
+		/// </summary>
+		/// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
+		public override async Task<bool> DisconnectAsync()
+		{
+			if (!IsConnected)
+				return false;
+
+			if (_disconnecting)
+				return false;
+
+			// Update the disconnecting flag
+			_disconnecting = true;
+
+			// Call the session disconnecting handler
+			OnDisconnecting();
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
+
+			// Call the session disconnecting handler in the server
+			Server.OnDisconnectingInternal(this);
+
+			try
+			{
+				try
+				{
+					// Shutdown the SSL stream
+					_sslStream.ShutdownAsync().Wait();
+				}
+				catch (Exception a_ex)
+				{
+					Logger.Error(a_ex);
+				}
+
+				// Dispose the SSL stream & buffer
+				_sslStream.Dispose();
+				_sslStreamId = null;
+
+				try
+				{
+					// Shutdown the socket associated with the client
+					Socket.Shutdown(SocketShutdown.Both);
+				}
+				catch (SocketException a_ex)
+				{
+					Logger.Error(a_ex);
+				}
+
+				// Close the session socket
+				Socket.Close();
+
+				// Dispose the session socket
+				Socket.Dispose();
+
+				// Update the session socket disposed flag
+				IsSocketDisposed = true;
+			}
+			catch (ObjectDisposedException a_ex)
+			{
+				Logger.Error(a_ex);
+			}
+
+			// Update the handshaked flag
+			IsHandshaked = false;
+
+			// Update the connected flag
+			IsConnected = false;
+
+			// Update sending/receiving flags
+			_receiving = false;
+			_sending = false;
+
+			// Clear send/receive buffers
+			ClearBuffers();
+
+			// Call the session disconnected handler
+			OnDisconnected();
+
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
+
+			// Unregister session
+			Server.UnregisterSession(Id);
+
+			// Call the session disconnected handler in the server
+			await Server.OnDisconnectedInternalAsync(this);
 
 			// Reset the disconnecting flag
 			_disconnecting = false;

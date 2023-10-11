@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
@@ -56,6 +57,7 @@ namespace NetCoreServer
 		#region Connect/Disconnect session
 		void Connect(Socket socket);
 		bool Disconnect();
+		Task<bool> DisconnectAsync();
 		#endregion
 
 		#region Send/Recieve data

@@ -461,6 +461,7 @@ namespace NetCoreServer
 		public event Action<SESSION_TYPE> Event_OnConnected;
 		public event Action<SESSION_TYPE> Event_OnDisconnecting;
 		public event Action<SESSION_TYPE> Event_OnDisconnected;
+		public event Func<SESSION_TYPE, Task> Event_OnDisconnectedAsync;
 		public event Action<SocketError, Exception> Event_OnError;
 
 		/// <summary>
@@ -537,6 +538,11 @@ namespace NetCoreServer
 		internal void OnDisconnectedInternal(SESSION_TYPE session)
 		{
 			Event_OnDisconnected?.Invoke(session);
+			OnDisconnected(session);
+		}
+		internal async Task OnDisconnectedInternalAsync(SESSION_TYPE session)
+		{
+			await Event_OnDisconnectedAsync?.Invoke(session);
 			OnDisconnected(session);
 		}
 

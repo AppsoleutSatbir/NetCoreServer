@@ -14,6 +14,7 @@ namespace NetCoreServer
 		public event Action<SESSION_TYPE> Event_OnConnected;
 		public event Action<SESSION_TYPE> Event_OnDisconnecting;
 		public event Action<SESSION_TYPE> Event_OnDisconnected;
+		public event Func<SESSION_TYPE, Task> Event_OnDisconnectedAsync;
 	}
 
 	public interface IBaseServer : IDisposable
