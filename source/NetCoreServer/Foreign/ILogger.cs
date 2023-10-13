@@ -48,6 +48,8 @@ namespace AC.NetCoreServer.Logging
 		void FlushLogs();
 
 		bool IsEnabled(ELogLevel a_logLevel);
+		void SwitchLogLevel(ELogLevel a_logLevel);
+		ELogLevel GetLogLevel();
 
 		//
 		// Summary:
