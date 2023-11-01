@@ -625,13 +625,21 @@ namespace NetCoreServer
 			}
 			catch (IOException a_ex)
 			{
-				Logger.Error(a_ex);
-				Disconnect();
+				if (Logger != null) Logger.Error(a_ex);
+				try
+				{
+					Disconnect();
+				}
+				catch (Exception) { }
 			}
 			catch (Exception a_ex)
 			{
-				Logger.Error(a_ex);
-				SendError(SocketError.OperationAborted, a_ex);
+				if (Logger != null) Logger.Error(a_ex);
+				try
+				{
+					SendError(SocketError.OperationAborted, a_ex);
+				}
+				catch (Exception) { }
 				//Satbir
 				//Disconnect();
 			}
