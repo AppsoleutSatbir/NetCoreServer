@@ -270,7 +270,7 @@ namespace NetCoreServer
 		/// </remarks>
 		protected virtual void OnReceived(byte[] buffer, long offset, long size)
 		{
-			if (ServerRef.IsLogging) Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
+			if (Logger.IsEnabled(ELogLevel.Verbose)) Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnReceived:: Offset: {OFFSET}, Size: {SIZE}", Id, offset, size);
 			Event_OnReceived?.Invoke(this, buffer, offset, size);
 		}
 		/// <summary>
@@ -284,7 +284,7 @@ namespace NetCoreServer
 		/// </remarks>
 		protected virtual void OnSent(long sent, long pending)
 		{
-			if (ServerRef.IsLogging) Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnSent:: Sent: {sent}, Pending: {pending}", Id, sent, pending);
+			if (Logger.IsEnabled(ELogLevel.Verbose)) Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnSent:: Sent: {sent}, Pending: {pending}", Id, sent, pending);
 			Event_OnSent?.Invoke(this, sent, pending);
 		}
 
