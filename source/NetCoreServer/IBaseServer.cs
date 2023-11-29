@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NetCoreServer
@@ -15,6 +13,7 @@ namespace NetCoreServer
 		public event Action<SESSION_TYPE> Event_OnDisconnecting;
 		public event Action<SESSION_TYPE> Event_OnDisconnected;
 		public event Func<SESSION_TYPE, Task> Event_OnDisconnectedAsync;
+		public IReadOnlyDictionary<Guid, SESSION_TYPE> ConnectedSessions { get; }
 	}
 
 	public interface IBaseServer : IDisposable
@@ -39,7 +38,7 @@ namespace NetCoreServer
 		/// <summary>
 		/// Number of sessions connected to the server
 		/// </summary>
-		public long ConnectedSessions { get; }
+		public long ConnectedSessionCount { get; }
 		/// <summary>
 		/// Number of bytes pending sent by the server
 		/// </summary>
