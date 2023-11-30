@@ -36,6 +36,7 @@ namespace NetCoreServer
 		/// </summary>
 		public EndPoint Endpoint { get; protected set; }
 
+		public IReadOnlyDictionary<Guid, SESSION_TYPE> ConnectedSessions { get { return Sessions; } }
 		/// <summary>
 		/// Number of sessions connected to the server
 		/// </summary>
