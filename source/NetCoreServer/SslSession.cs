@@ -114,7 +114,14 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
-				Logger.Error(a_ex);
+				if (Logger == null)
+				{
+					FileUtilities.Write($"SSLSession::Connect:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+				}
+				else
+				{
+					Logger.Error(a_ex);
+				}
 				SendError(SocketError.NotConnected, a_ex);
 				Disconnect();
 			}
@@ -135,15 +142,15 @@ namespace NetCoreServer
 			// Update the disconnecting flag
 			_disconnecting = true;
 
-			// Call the session disconnecting handler
-			OnDisconnecting();
-			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
-
-			// Call the session disconnecting handler in the server
-			Server.OnDisconnectingInternal(this);
-
 			try
 			{
+				// Call the session disconnecting handler
+				OnDisconnecting();
+				Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
+
+				// Call the session disconnecting handler in the server
+				Server.OnDisconnectingInternal(this);
+
 				try
 				{
 					// Shutdown the SSL stream
@@ -151,7 +158,14 @@ namespace NetCoreServer
 				}
 				catch (Exception a_ex)
 				{
-					Logger.Error(a_ex);
+					if (Logger == null)
+					{
+						FileUtilities.Write($"SSLSession::Disconnect1:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					}
+					else
+					{
+						Logger.Error(a_ex);
+					}
 				}
 
 				// Dispose the SSL stream & buffer
@@ -179,7 +193,25 @@ namespace NetCoreServer
 			}
 			catch (ObjectDisposedException a_ex)
 			{
-				Logger.Error(a_ex);
+				if (Logger == null)
+				{
+					FileUtilities.Write($"SSLSession::Disconnect2:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+				}
+				else
+				{
+					Logger.Error(a_ex);
+				}
+			}
+			catch (Exception a_ex)
+			{
+				if (Logger == null)
+				{
+					FileUtilities.Write($"SSLSession::Disconnect3:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+				}
+				else
+				{
+					Logger.Error(a_ex);
+				}
 			}
 
 			// Update the handshaked flag
@@ -195,16 +227,58 @@ namespace NetCoreServer
 			// Clear send/receive buffers
 			ClearBuffers();
 
-			// Call the session disconnected handler
-			OnDisconnected();
+			try
+			{
+				// Call the session disconnected handler
+				OnDisconnected();
+			}
+			catch (Exception a_ex)
+			{
+				if (Logger == null)
+				{
+					FileUtilities.Write($"SSLSession::Disconnect4:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+				}
+				else
+				{
+					Logger.Error(a_ex);
+				}
+			}
 
-			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
+			try
+			{
+				Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
 
-			// Unregister session
-			Server.UnregisterSession(Id);
+				// Unregister session
+				Server.UnregisterSession(Id);
+			}
+			catch (Exception a_ex)
+			{
+				if (Logger == null)
+				{
+					FileUtilities.Write($"SSLSession::Disconnect5:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+				}
+				else
+				{
+					Logger.Error(a_ex);
+				}
+			}
 
-			// Call the session disconnected handler in the server
-			Server.OnDisconnectedInternal(this);
+			try
+			{
+				// Call the session disconnected handler in the server
+				Server.OnDisconnectedInternal(this);
+			}
+			catch (Exception a_ex)
+			{
+				if (Logger == null)
+				{
+					FileUtilities.Write($"SSLSession::Disconnect6:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+				}
+				else
+				{
+					Logger.Error(a_ex);
+				}
+			}
 
 			// Reset the disconnecting flag
 			_disconnecting = false;

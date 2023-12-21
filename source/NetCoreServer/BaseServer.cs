@@ -306,8 +306,16 @@ namespace NetCoreServer
 				// Register the session
 				RegisterSession(session);
 
-				// Connect new session
-				session.Connect(e.AcceptSocket);
+				try
+				{
+					// Connect new session
+					session.Connect(e.AcceptSocket);
+				}
+				catch (Exception ex)
+				{
+					Logger.Error(ex);
+					session.Disconnect();
+				}
 			}
 			else
 				SendError(e.SocketError, e.ConnectByNameError);
