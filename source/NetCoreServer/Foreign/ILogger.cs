@@ -43,7 +43,7 @@ namespace AC.NetCoreServer.Logging
 		Fatal
 	}
 
-	public interface ILogger
+	public interface ILogger : IDisposable
 	{
 		void FlushLogs();
 
