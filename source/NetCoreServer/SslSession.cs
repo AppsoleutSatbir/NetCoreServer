@@ -116,14 +116,14 @@ namespace NetCoreServer
 			{
 				if (Logger == null)
 				{
-					FileUtilities.Write($"SSLSession::Connect:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					FileUtilities.Write($"SSLSession::Connect:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
 				}
 				else
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::Connect:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 				SendError(SocketError.NotConnected, a_ex);
-				Disconnect();
+				Disconnect("SSLSession::Connect");
 			}
 		}
 
@@ -131,8 +131,9 @@ namespace NetCoreServer
 		/// Disconnect the session
 		/// </summary>
 		/// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
-		public override bool Disconnect()
+		public override bool Disconnect(string a_marker)
 		{
+			Logger.Information("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
 			if (!IsConnected)
 				return false;
 
@@ -160,11 +161,11 @@ namespace NetCoreServer
 				{
 					if (Logger == null)
 					{
-						FileUtilities.Write($"SSLSession::Disconnect1:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+						FileUtilities.Write($"SSLSession::Disconnect1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
 					}
 					else
 					{
-						Logger.Error(a_ex);
+						Logger.Error($"SSLSession::Disconnect1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 					}
 				}
 
@@ -179,7 +180,14 @@ namespace NetCoreServer
 				}
 				catch (SocketException a_ex)
 				{
-					Logger.Error(a_ex);
+					if (Logger == null)
+					{
+						FileUtilities.Write($"SSLSession::Disconnect2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					}
+					else
+					{
+						Logger.Error($"SSLSession::Disconnect2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+					}
 				}
 
 				// Close the session socket
@@ -195,22 +203,22 @@ namespace NetCoreServer
 			{
 				if (Logger == null)
 				{
-					FileUtilities.Write($"SSLSession::Disconnect2:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					FileUtilities.Write($"SSLSession::Disconnect3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
 				}
 				else
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::Disconnect3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 			}
 			catch (Exception a_ex)
 			{
 				if (Logger == null)
 				{
-					FileUtilities.Write($"SSLSession::Disconnect3:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					FileUtilities.Write($"SSLSession::Disconnect4:[ {(_sslStreamId == null ? "null" : _sslStreamId.ToString())}::Logger is null with exception {a_ex.Message}\n{a_ex}");
 				}
 				else
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::Disconnect4:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 			}
 
@@ -236,11 +244,11 @@ namespace NetCoreServer
 			{
 				if (Logger == null)
 				{
-					FileUtilities.Write($"SSLSession::Disconnect4:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					FileUtilities.Write($"SSLSession::Disconnect5:[ {(_sslStreamId == null ? "null" : _sslStreamId.ToString())}::Logger is null with exception {a_ex.Message}\n{a_ex}");
 				}
 				else
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::Disconnect5:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 			}
 
@@ -255,11 +263,11 @@ namespace NetCoreServer
 			{
 				if (Logger == null)
 				{
-					FileUtilities.Write($"SSLSession::Disconnect5:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					FileUtilities.Write($"SSLSession::Disconnect6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
 				}
 				else
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::Disconnect6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 			}
 
@@ -272,11 +280,11 @@ namespace NetCoreServer
 			{
 				if (Logger == null)
 				{
-					FileUtilities.Write($"SSLSession::Disconnect6:[{_sslStreamId}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+					FileUtilities.Write($"SSLSession::Disconnect7:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
 				}
 				else
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::Disconnect7:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 			}
 
@@ -290,8 +298,9 @@ namespace NetCoreServer
 		/// Disconnect the session
 		/// </summary>
 		/// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
-		public override async Task<bool> DisconnectAsync()
+		public override async Task<bool> DisconnectAsync(string a_marker)
 		{
+			Logger.Information("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
 			if (!IsConnected)
 				return false;
 
@@ -303,7 +312,7 @@ namespace NetCoreServer
 
 			// Call the session disconnecting handler
 			OnDisconnecting();
-			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]::DisconnectingAsync.", Id);
 
 			// Call the session disconnecting handler in the server
 			Server.OnDisconnectingInternal(this);
@@ -317,7 +326,7 @@ namespace NetCoreServer
 				}
 				catch (Exception a_ex)
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::DisconnectAsync1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 
 				// Dispose the SSL stream & buffer
@@ -331,7 +340,7 @@ namespace NetCoreServer
 				}
 				catch (SocketException a_ex)
 				{
-					Logger.Error(a_ex);
+					Logger.Error($"SSLSession::DisconnectAsync2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				}
 
 				// Close the session socket
@@ -345,7 +354,7 @@ namespace NetCoreServer
 			}
 			catch (ObjectDisposedException a_ex)
 			{
-				Logger.Error(a_ex);
+				Logger.Error($"SSLSession::DisconnectAsync3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 			}
 
 			// Update the handshaked flag
@@ -364,7 +373,7 @@ namespace NetCoreServer
 			// Call the session disconnected handler
 			OnDisconnected();
 
-			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
+			Logger.Debug("Client[{CLIENT_SESSION_ID}]:: DisconnectedAsync.", Id);
 
 			// Unregister session
 			Server.UnregisterSession(Id);
@@ -494,7 +503,7 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
-				Logger.Error(a_ex);
+				Logger.Error($"SSLSession::Receive:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				SendError(SocketError.OperationAborted, a_ex);
 				//Satbir:
 				//Disconnect();
@@ -526,8 +535,8 @@ namespace NetCoreServer
 					result = _sslStream.BeginRead(_receiveBuffer.Data, 0, (int)_receiveBuffer.Capacity, ProcessReceive, _sslStreamId);
 				} while (result.CompletedSynchronously);
 			}
-			catch (ObjectDisposedException a_ex) { Logger.Error(a_ex); }
-			catch (Exception a_ex) { Logger.Error(a_ex); }
+			catch (ObjectDisposedException a_ex) { Logger.Error($"SSLSession::TryReceive1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex); }
+			catch (Exception a_ex) { Logger.Error($"SSLSession::TryReceive2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex); }
 		}
 
 		/// <summary>
@@ -579,7 +588,7 @@ namespace NetCoreServer
 				// Async write with the write handler
 				_sslStream.BeginWrite(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset), ProcessSend, _sslStreamId);
 			}
-			catch (ObjectDisposedException a_ex) { Logger.Error(a_ex); }
+			catch (ObjectDisposedException a_ex) { Logger.Error($"SSLSession::TrySend:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex); }
 		}
 
 		#endregion
@@ -627,9 +636,9 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
-				Logger.Error(a_ex);
+				Logger.Error($"SSLSession::ProcessHandshake:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				SendError(SocketError.NotConnected, a_ex);
-				Disconnect();
+				Disconnect("SSLSession::ProcessHandshake");
 			}
 		}
 
@@ -668,7 +677,7 @@ namespace NetCoreServer
 					}
 					catch (Exception a_ex)
 					{
-						Logger.Error(a_ex);
+						Logger.Error($"SSLSession::ProcessReceive1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 					}
 
 					// If the receive buffer is full increase its size
@@ -678,7 +687,7 @@ namespace NetCoreServer
 						if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
 						{
 							SendError(SocketError.NoBufferSpaceAvailable);
-							Disconnect();
+							Disconnect("SSLSession::ProcessReceive1");
 							return;
 						}
 
@@ -695,20 +704,20 @@ namespace NetCoreServer
 						TryReceive();
 				}
 				else
-					Disconnect();
+					Disconnect("SSLSession::ProcessReceive2");
 			}
 			catch (IOException a_ex)
 			{
-				if (Logger != null) Logger.Error(a_ex);
+				if (Logger != null) Logger.Error($"SSLSession::ProcessReceive2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				try
 				{
-					Disconnect();
+					Disconnect("SSLSession::ProcessReceive3");
 				}
 				catch (Exception) { }
 			}
 			catch (Exception a_ex)
 			{
-				if (Logger != null) Logger.Error(a_ex);
+				if (Logger != null) Logger.Error($"SSLSession::ProcessReceive3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				try
 				{
 					SendError(SocketError.OperationAborted, a_ex);
@@ -767,7 +776,7 @@ namespace NetCoreServer
 			}
 			catch (Exception a_ex)
 			{
-				Logger.Error(a_ex);
+				Logger.Error($"SSLSession::ProcessSend:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
 				SendError(SocketError.OperationAborted, a_ex);
 				//Satbir
 				//Disconnect();

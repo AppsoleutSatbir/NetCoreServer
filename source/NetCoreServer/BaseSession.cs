@@ -80,13 +80,14 @@ namespace NetCoreServer
 		{
 
 		}
-		public virtual bool Disconnect()
+		public virtual bool Disconnect(string a_marker)
 		{
 			return false;
 		}
-		public virtual async Task<bool> DisconnectAsync()
+		public virtual async Task<bool> DisconnectAsync(string a_marker)
 		{
-			throw new NotImplementedException();
+			await Task.CompletedTask;
+			return true;
 		}
 		#endregion
 
@@ -366,7 +367,7 @@ namespace NetCoreServer
 				if (disposingManagedResources)
 				{
 					// Dispose managed resources here...
-					Disconnect();
+					Disconnect("BaseSession::Dispose");
 					Event_OnSent = null;
 					Event_OnReceived = null;
 					ServerRef = null;

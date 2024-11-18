@@ -15,7 +15,7 @@ namespace NetCoreServer
 		public WsSession(WsServer server) : base(server) { WebSocket = new WebSocket(this); }
 
 		// WebSocket connection methods
-		public virtual bool Close(int status) { SendCloseAsync(status, Span<byte>.Empty); base.Disconnect(); return true; }
+		public virtual bool Close(int status) { SendCloseAsync(status, Span<byte>.Empty); base.Disconnect("WsSession::Clone:" + status); return true; }
 
 		#region WebSocket send text methods
 

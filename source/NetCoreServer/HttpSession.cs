@@ -143,7 +143,7 @@ namespace NetCoreServer
 			{
 				OnReceivedRequestError(Request, "Invalid HTTP request!");
 				Request.Clear();
-				Disconnect();
+				Disconnect("HTTPSession:OnReceive1");
 				return;
 			}
 
@@ -160,7 +160,7 @@ namespace NetCoreServer
 			{
 				OnReceivedRequestError(Request, "Invalid HTTP request!");
 				Request.Clear();
-				Disconnect();
+				Disconnect("HTTPSession:OnReceive2");
 				return;
 			}
 		}

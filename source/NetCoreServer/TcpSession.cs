@@ -105,8 +105,9 @@ namespace NetCoreServer
 		/// Disconnect the session
 		/// </summary>
 		/// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
-		public override bool Disconnect()
+		public override bool Disconnect(string a_marker)
 		{
+			Logger.Information("TCPSession:Disconnect::Marker:{Marker}", a_marker);
 			if (!IsConnected)
 				return false;
 
@@ -170,7 +171,7 @@ namespace NetCoreServer
 
 		#endregion
 
-        #region Send/Receive data
+		#region Send/Receive data
 
 		// Receive buffer
 		private SocketAsyncEventArgs _receiveEventArg;
@@ -204,7 +205,7 @@ namespace NetCoreServer
 			if (ec != SocketError.Success)
 			{
 				SendError(ec);
-				Disconnect();
+				Disconnect("TCPSession::Send");
 			}
 
 			return sent;
@@ -280,7 +281,6 @@ namespace NetCoreServer
 			if (ec != SocketError.Success)
 			{
 				SendError(ec);
-				Disconnect();
 			}
 
 			return received;
@@ -431,7 +431,7 @@ namespace NetCoreServer
 					if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
 					{
 						SendError(SocketError.NoBufferSpaceAvailable);
-						Disconnect();
+						Disconnect("TCPSession::ProcessReceive");
 						return false;
 					}
 
@@ -448,12 +448,12 @@ namespace NetCoreServer
 				if (size > 0)
 					return true;
 				else
-					Disconnect();
+					Disconnect("TCPSession::ProcessReceive22");
 			}
 			else
 			{
 				SendError(e.SocketError);
-				Disconnect();
+				Disconnect("TCPSession::ProcessReceive33");
 			}
 
 			return false;
@@ -498,7 +498,7 @@ namespace NetCoreServer
 			else
 			{
 				SendError(e.SocketError);
-				Disconnect();
+				Disconnect("TCPSession::ProcessSend");
 				return false;
 			}
 		}

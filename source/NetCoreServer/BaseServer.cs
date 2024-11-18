@@ -314,7 +314,7 @@ namespace NetCoreServer
 				catch (Exception ex)
 				{
 					Logger.Error(ex);
-					session.Disconnect();
+					session.Disconnect("BaseServer::ProcessAccept");
 				}
 			}
 			else
@@ -364,7 +364,7 @@ namespace NetCoreServer
 
 			// Disconnect all sessions
 			foreach (var session in Sessions.Values)
-				session.Disconnect();
+				session.Disconnect("BaseServer::DisconnectAll");
 
 			return true;
 		}

@@ -56,8 +56,8 @@ namespace NetCoreServer
 
 		#region Connect/Disconnect session
 		void Connect(Socket socket);
-		bool Disconnect();
-		Task<bool> DisconnectAsync();
+		bool Disconnect(string a_marker);
+		Task<bool> DisconnectAsync(string a_marker);
 		#endregion
 
 		#region Send/Recieve data
