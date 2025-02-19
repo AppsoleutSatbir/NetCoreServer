@@ -14,8 +14,14 @@ namespace NetCoreServer
 
 		public WsSession(WsServer server) : base(server) { WebSocket = new WebSocket(this); }
 
-		// WebSocket connection methods
-		public virtual bool Close(int status) { SendCloseAsync(status, Span<byte>.Empty); base.Disconnect("WsSession::Clone:" + status); return true; }
+        // WebSocket connection methods
+        public virtual bool Close() => Close(0, Span<byte>.Empty);
+        public virtual bool Close(int status) => Close(status, Span<byte>.Empty);
+        public virtual bool Close(int status, string text) => Close(status, Encoding.UTF8.GetBytes(text));
+        public virtual bool Close(int status, ReadOnlySpan<char> text) => Close(status, Encoding.UTF8.GetBytes(text.ToArray()));
+        public virtual bool Close(int status, byte[] buffer) => Close(status, buffer.AsSpan());
+        public virtual bool Close(int status, byte[] buffer, long offset, long size) => Close(status, buffer.AsSpan((int)offset, (int)size));
+        public virtual bool Close(int status, ReadOnlySpan<byte> buffer) { SendCloseAsync(status, buffer); base.Disconnect(); return true; }
 
 		#region WebSocket send text methods
 
@@ -323,18 +329,18 @@ namespace NetCoreServer
 
 		#region Web socket handlers
 
-		public virtual void OnWsConnecting(HttpRequest request) { }
-		public virtual void OnWsConnected(HttpResponse response) { }
-		public virtual bool OnWsConnecting(HttpRequest request, HttpResponse response) { return true; }
-		public virtual void OnWsConnected(HttpRequest request) { }
-		public virtual void OnWsDisconnecting() { }
-		public virtual void OnWsDisconnected() { }
-		public virtual void OnWsReceived(byte[] buffer, long offset, long size) { }
-		public virtual void OnWsClose(byte[] buffer, long offset, long size, int status = 1000) { Close(status); }
-		public virtual void OnWsPing(byte[] buffer, long offset, long size) { SendPongAsync(buffer, offset, size); }
-		public virtual void OnWsPong(byte[] buffer, long offset, long size) { }
-		public virtual void OnWsError(string error) { OnError(SocketError.SocketError, null); }
-		public virtual void OnWsError(SocketError error) { OnError(error, null); }
+        public virtual void OnWsConnecting(HttpRequest request) {}
+        public virtual void OnWsConnected(HttpResponse response) {}
+        public virtual bool OnWsConnecting(HttpRequest request, HttpResponse response) { return true; }
+        public virtual void OnWsConnected(HttpRequest request) {}
+        public virtual void OnWsDisconnecting() {}
+        public virtual void OnWsDisconnected() {}
+        public virtual void OnWsReceived(byte[] buffer, long offset, long size) {}
+        public virtual void OnWsClose(byte[] buffer, long offset, long size, int status = 1000) { Close(); }
+        public virtual void OnWsPing(byte[] buffer, long offset, long size) { SendPongAsync(buffer, offset, size); }
+        public virtual void OnWsPong(byte[] buffer, long offset, long size) {}
+        public virtual void OnWsError(string error) { OnError(SocketError.SocketError); }
+        public virtual void OnWsError(SocketError error) { OnError(error); }
 
 		public void SendUpgrade(HttpResponse response) { SendResponseAsync(response); }
 
