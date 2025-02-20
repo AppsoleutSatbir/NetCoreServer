@@ -113,59 +113,59 @@ namespace NetCoreServer
 
 		#endregion
 
-        #region Session management
+		#region Session management
 
-        /// <summary>
-        /// Server sessions
-        /// </summary>
-        protected readonly ConcurrentDictionary<Guid, SslSession> Sessions = new ConcurrentDictionary<Guid, SslSession>();
+		/// <summary>
+		/// Server sessions
+		/// </summary>
+		protected readonly ConcurrentDictionary<Guid, SslSession> Sessions = new ConcurrentDictionary<Guid, SslSession>();
 
-        /// <summary>
-        /// Disconnect all connected sessions
-        /// </summary>
-        /// <returns>'true' if all sessions were successfully disconnected, 'false' if the server is not started</returns>
-        public virtual bool DisconnectAll()
-        {
-            if (!IsStarted)
-                return false;
+		/// <summary>
+		/// Disconnect all connected sessions
+		/// </summary>
+		/// <returns>'true' if all sessions were successfully disconnected, 'false' if the server is not started</returns>
+		public virtual bool DisconnectAll()
+		{
+			if (!IsStarted)
+				return false;
 
-            // Disconnect all sessions
-            foreach (var session in Sessions.Values)
-                session.Disconnect();
+			// Disconnect all sessions
+			foreach (var session in Sessions.Values)
+				session.Disconnect("SslServer:DisconnectAll:");
 
-            return true;
-        }
+			return true;
+		}
 
-        /// <summary>
-        /// Find a session with a given Id
-        /// </summary>
-        /// <param name="id">Session Id</param>
-        /// <returns>Session with a given Id or null if the session it not connected</returns>
-        public SslSession FindSession(Guid id)
-        {
-            // Try to find the required session
-            return Sessions.TryGetValue(id, out SslSession result) ? result : null;
-        }
+		/// <summary>
+		/// Find a session with a given Id
+		/// </summary>
+		/// <param name="id">Session Id</param>
+		/// <returns>Session with a given Id or null if the session it not connected</returns>
+		public SslSession FindSession(Guid id)
+		{
+			// Try to find the required session
+			return Sessions.TryGetValue(id, out SslSession result) ? result : null;
+		}
 
-        /// <summary>
-        /// Register a new session
-        /// </summary>
-        /// <param name="session">Session to register</param>
-        internal void RegisterSession(SslSession session)
-        {
-            // Register a new session
-            Sessions.TryAdd(session.Id, session);
-        }
+		/// <summary>
+		/// Register a new session
+		/// </summary>
+		/// <param name="session">Session to register</param>
+		internal void RegisterSession(SslSession session)
+		{
+			// Register a new session
+			Sessions.TryAdd(session.Id, session);
+		}
 
-        /// <summary>
-        /// Unregister session by Id
-        /// </summary>
-        /// <param name="id">Session Id</param>
-        internal void UnregisterSession(Guid id)
-        {
-            // Unregister session by Id
-            Sessions.TryRemove(id, out SslSession _);
-        }
+		/// <summary>
+		/// Unregister session by Id
+		/// </summary>
+		/// <param name="id">Session Id</param>
+		internal void UnregisterSession(Guid id)
+		{
+			// Unregister session by Id
+			Sessions.TryRemove(id, out SslSession _);
+		}
 
 		#endregion
 
