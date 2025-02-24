@@ -348,8 +348,11 @@ namespace NetCoreServer
 
 		#endregion
 
-		#region Session management	
-		// Server sessions
+		#region Session management
+		
+		/// <summary>
+        /// Server sessions
+        /// </summary>
 		protected readonly ConcurrentDictionary<Guid, SESSION_TYPE> Sessions = new ConcurrentDictionary<Guid, SESSION_TYPE>();
 
 
