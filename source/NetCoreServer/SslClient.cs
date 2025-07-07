@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -20,26 +21,26 @@ namespace NetCoreServer
         /// <param name="context">SSL context</param>
         /// <param name="address">IP address</param>
         /// <param name="port">Port number</param>
-        public SslClient(SslContext context, IPAddress address, int port) : this(context, new IPEndPoint(address, port)) {}
+        public SslClient(SslContext context, IPAddress address, int port) : this(context, new IPEndPoint(address, port)) { }
         /// <summary>
         /// Initialize SSL client with a given server IP address and port number
         /// </summary>
         /// <param name="context">SSL context</param>
         /// <param name="address">IP address</param>
         /// <param name="port">Port number</param>
-        public SslClient(SslContext context, string address, int port) : this(context, new IPEndPoint(IPAddress.Parse(address), port)) {}
+        public SslClient(SslContext context, string address, int port) : this(context, new IPEndPoint(IPAddress.Parse(address), port)) { }
         /// <summary>
         /// Initialize SSL client with a given DNS endpoint
         /// </summary>
         /// <param name="context">SSL context</param>
         /// <param name="endpoint">DNS endpoint</param>
-        public SslClient(SslContext context, DnsEndPoint endpoint) : this(context, endpoint as EndPoint, endpoint.Host, endpoint.Port) {}
+        public SslClient(SslContext context, DnsEndPoint endpoint) : this(context, endpoint as EndPoint, endpoint.Host, endpoint.Port) { }
         /// <summary>
         /// Initialize SSL client with a given IP endpoint
         /// </summary>
         /// <param name="context">SSL context</param>
         /// <param name="endpoint">IP endpoint</param>
-        public SslClient(SslContext context, IPEndPoint endpoint) : this(context, endpoint as EndPoint, endpoint.Address.ToString(), endpoint.Port) {}
+        public SslClient(SslContext context, IPEndPoint endpoint) : this(context, endpoint as EndPoint, endpoint.Address.ToString(), endpoint.Port) { }
         /// <summary>
         /// Initialize SSL client with a given SSL context, endpoint, address and port
         /// </summary>
@@ -236,10 +237,13 @@ namespace NetCoreServer
                 // Connect to the server
                 Socket.Connect(Endpoint);
             }
-            catch (SocketException ex)
+            catch (SocketException a_ex)
             {
+                Console.WriteLine($"SSLCLient::Connect:Error");
+                Console.WriteLine(a_ex);
+
                 // Call the client error handler
-                SendError(ex.SocketErrorCode);
+                SendError(a_ex.SocketErrorCode);
 
                 // Reset event args
                 _connectEventArg.Completed -= OnAsyncCompleted;
@@ -309,8 +313,11 @@ namespace NetCoreServer
                 else
                     _sslStream.AuthenticateAsClient(Address);
             }
-            catch (Exception)
+            catch (Exception a_ex)
             {
+                Console.WriteLine($"SSLCLient::Connect1:Error");
+                Console.WriteLine(a_ex);
+
                 SendError(SocketError.NotConnected);
                 DisconnectAsync();
                 return false;
@@ -365,7 +372,11 @@ namespace NetCoreServer
                     // Shutdown the SSL stream
                     _sslStream.ShutdownAsync().Wait();
                 }
-                catch (Exception) {}
+                catch (Exception a_ex)
+                {
+                    Console.WriteLine($"SSLClient::Disconnect:Error");
+                    Console.WriteLine(a_ex);
+                }
 
                 // Dispose the SSL stream & buffer
                 _sslStream.Dispose();
@@ -376,7 +387,11 @@ namespace NetCoreServer
                     // Shutdown the socket associated with the client
                     Socket.Shutdown(SocketShutdown.Both);
                 }
-                catch (SocketException) {}
+                catch (SocketException a_ex)
+                {
+                    Console.WriteLine($"SSLClient::Disconnect1:Error");
+                    Console.WriteLine(a_ex);
+                }
 
                 // Close the client socket
                 Socket.Close();
@@ -390,7 +405,11 @@ namespace NetCoreServer
                 // Update the client socket disposed flag
                 IsSocketDisposed = true;
             }
-            catch (ObjectDisposedException) {}
+            catch (ObjectDisposedException a_ex)
+            {
+                Console.WriteLine($"SSLClient::Disconnect2:Error");
+                Console.WriteLine(a_ex);
+            }
 
             // Update the handshaked flag
             IsHandshaked = false;
@@ -547,8 +566,11 @@ namespace NetCoreServer
 
                 return sent;
             }
-            catch (Exception)
+            catch (Exception a_ex)
             {
+                Console.WriteLine($"SSLClient::Send:Error span");
+                Console.WriteLine(a_ex);
+
                 SendError(SocketError.OperationAborted);
                 Disconnect();
                 return 0;
@@ -677,8 +699,11 @@ namespace NetCoreServer
 
                 return received;
             }
-            catch (Exception)
+            catch (Exception a_ex)
             {
+                Console.WriteLine($"SSLClient::Receive:Error");
+                Console.WriteLine(a_ex);
+
                 SendError(SocketError.OperationAborted);
                 Disconnect();
                 return 0;
@@ -731,7 +756,16 @@ namespace NetCoreServer
                 } while (result.CompletedSynchronously);
 
             }
-            catch (ObjectDisposedException) {}
+            catch (ObjectDisposedException a_ex)
+            {
+                Console.WriteLine($"SSLClient::TryReceive:Error");
+                Console.WriteLine(a_ex);
+            }
+            catch (Exception a_ex)
+            {
+                Console.WriteLine($"SSLClient::TryReceive1:Error");
+                Console.WriteLine(a_ex);
+            }
         }
 
         /// <summary>
@@ -783,7 +817,16 @@ namespace NetCoreServer
                 // Async write with the write handler
                 _sslStream.BeginWrite(_sendBufferFlush.Data, (int)_sendBufferFlushOffset, (int)(_sendBufferFlush.Size - _sendBufferFlushOffset), ProcessSend, _sslStreamId);
             }
-            catch (ObjectDisposedException) {}
+            catch (ObjectDisposedException a_ex)
+            {
+                Console.WriteLine($"SSLClient::TrySend:Error");
+                Console.WriteLine(a_ex);
+            }
+            catch (Exception a_ex)
+            {
+                Console.WriteLine($"SSLClient::TrySend1:Error");
+                Console.WriteLine(a_ex);
+            }
         }
 
         /// <summary>
@@ -796,7 +839,7 @@ namespace NetCoreServer
                 // Clear send buffers
                 _sendBufferMain.Clear();
                 _sendBufferFlush.Clear();
-                _sendBufferFlushOffset= 0;
+                _sendBufferFlushOffset = 0;
 
                 // Update statistic
                 BytesPending = 0;
@@ -885,14 +928,19 @@ namespace NetCoreServer
                     else
                         _sslStream.BeginAuthenticateAsClient(Address, ProcessHandshake, _sslStreamId);
                 }
-                catch (Exception)
+                catch (Exception a_ex)
                 {
+                    Console.WriteLine($"SSLClient::ProcessConnect:Error");
+                    Console.WriteLine(a_ex);
+
                     SendError(SocketError.NotConnected);
                     DisconnectAsync();
                 }
             }
             else
             {
+                Console.WriteLine($"SSLClient::ProcessConnect::Error:" + e.SocketError);
+
                 // Call the client disconnected handler
                 SendError(e.SocketError);
                 OnDisconnected();
@@ -936,8 +984,11 @@ namespace NetCoreServer
                 if (_sendBufferMain.IsEmpty)
                     OnEmpty();
             }
-            catch (Exception)
+            catch (Exception a_ex)
             {
+                Console.WriteLine($"SSLClient::ProcessHandshake:Error");
+                Console.WriteLine(a_ex);
+
                 SendError(SocketError.NotConnected);
                 DisconnectAsync();
             }
@@ -996,8 +1047,11 @@ namespace NetCoreServer
                 else
                     DisconnectAsync();
             }
-            catch (Exception)
+            catch (Exception a_ex)
             {
+                Console.WriteLine($"SSLClient::ProcessReceive:Error");
+                Console.WriteLine(a_ex);
+
                 SendError(SocketError.OperationAborted);
                 DisconnectAsync();
             }
@@ -1048,8 +1102,11 @@ namespace NetCoreServer
                 // Try to send again if the client is valid
                 TrySend();
             }
-            catch (Exception)
+            catch (Exception a_ex)
             {
+                Console.WriteLine($"SSLClient::ProcessSend:Error");
+                Console.WriteLine(a_ex);
+
                 SendError(SocketError.OperationAborted);
                 DisconnectAsync();
             }
@@ -1062,27 +1119,27 @@ namespace NetCoreServer
         /// <summary>
         /// Handle client connecting notification
         /// </summary>
-        protected virtual void OnConnecting() {}
+        protected virtual void OnConnecting() { }
         /// <summary>
         /// Handle client connected notification
         /// </summary>
-        protected virtual void OnConnected() {}
+        protected virtual void OnConnected() { }
         /// <summary>
         /// Handle client handshaking notification
         /// </summary>
-        protected virtual void OnHandshaking() {}
+        protected virtual void OnHandshaking() { }
         /// <summary>
         /// Handle client handshaked notification
         /// </summary>
-        protected virtual void OnHandshaked() {}
+        protected virtual void OnHandshaked() { }
         /// <summary>
         /// Handle client disconnecting notification
         /// </summary>
-        protected virtual void OnDisconnecting() {}
+        protected virtual void OnDisconnecting() { }
         /// <summary>
         /// Handle client disconnected notification
         /// </summary>
-        protected virtual void OnDisconnected() {}
+        protected virtual void OnDisconnected() { }
 
         /// <summary>
         /// Handle buffer received notification
@@ -1093,7 +1150,7 @@ namespace NetCoreServer
         /// <remarks>
         /// Notification is called when another part of buffer was received from the server
         /// </remarks>
-        protected virtual void OnReceived(byte[] buffer, long offset, long size) {}
+        protected virtual void OnReceived(byte[] buffer, long offset, long size) { }
         /// <summary>
         /// Handle buffer sent notification
         /// </summary>
@@ -1103,7 +1160,7 @@ namespace NetCoreServer
         /// Notification is called when another part of buffer was sent to the server.
         /// This handler could be used to send another buffer to the server for instance when the pending size is zero.
         /// </remarks>
-        protected virtual void OnSent(long sent, long pending) {}
+        protected virtual void OnSent(long sent, long pending) { }
 
         /// <summary>
         /// Handle empty send buffer notification
@@ -1112,13 +1169,13 @@ namespace NetCoreServer
         /// Notification is called when the send buffer is empty and ready for a new data to send.
         /// This handler could be used to send another buffer to the server.
         /// </remarks>
-        protected virtual void OnEmpty() {}
+        protected virtual void OnEmpty() { }
 
         /// <summary>
         /// Handle error notification
         /// </summary>
         /// <param name="error">Socket error code</param>
-        protected virtual void OnError(SocketError error) {}
+        protected virtual void OnError(SocketError error) { }
 
         #endregion
 

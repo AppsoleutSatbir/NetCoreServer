@@ -235,7 +235,11 @@ namespace NetCoreServer
                     if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
                         return true;
                 }
-                catch (Exception) {}
+                catch (Exception a_Ex)
+                {
+                    Console.WriteLine($"FileCache::IsDirectory::Path{path}");
+                    Console.WriteLine(a_Ex);
+                }
 
                 return false;
             }
@@ -317,7 +321,12 @@ namespace NetCoreServer
 
                 return true;
             }
-            catch (Exception) { return false; }
+            catch (Exception a_ex)
+            {
+                Console.WriteLine($"FileCache::InsertFileInternal:Path:'{path}',File:'{file}',Key:'{key}'");
+                Console.WriteLine(a_ex);
+                return false;
+            }
         }
 
         private bool RemoveFileInternal(string path, string key)
@@ -332,7 +341,12 @@ namespace NetCoreServer
 
                 return Remove(key);
             }
-            catch (Exception) { return false; }
+            catch (Exception a_ex)
+            {
+                Console.WriteLine($"FileCache::RemoveFileInternal:Path:'{path}',Key:'{key}'");
+                Console.WriteLine(a_ex);
+                return false;
+            }
         }
 
         private bool InsertPathInternal(string root, string path, string prefix, TimeSpan timeout, InsertHandler handler)
@@ -360,7 +374,12 @@ namespace NetCoreServer
 
                 return true;
             }
-            catch (Exception) { return false; }
+            catch (Exception a_ex)
+            {
+                Console.WriteLine($"FileCache::InsertFileInternal:Root:'{root}',Path:'{path}',Prefix:'{prefix}'");
+                Console.WriteLine(a_ex);
+                return false;
+            }
         }
 
         private bool RemovePathInternal(string path)
