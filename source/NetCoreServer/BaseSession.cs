@@ -285,7 +285,7 @@ namespace NetCoreServer
 		/// </remarks>
 		protected virtual void OnSent(long sent, long pending)
 		{
-			if (Logger.IsEnabled(ELogLevel.Verbose)) Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnSent:: Sent: {sent}, Pending: {pending}", Id, sent, pending);
+			//if (Logger.IsEnabled(ELogLevel.Verbose)) Logger.Verbose("Client[{CLIENT_SESSION_ID}]::OnSent:: Sent: {sent}, Pending: {pending}", Id, sent, pending);
 			Event_OnSent?.Invoke(this, sent, pending);
 		}
 
