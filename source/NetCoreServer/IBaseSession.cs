@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
-	public interface IBaseSession : IDisposable
+	public interface IHasId { Guid Id { get; } }
+	public interface IBaseSession : IHasId, IDisposable
 	{
 		IBaseServer ServerRef { get; }
 
