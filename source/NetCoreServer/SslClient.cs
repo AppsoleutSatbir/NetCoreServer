@@ -13,7 +13,7 @@ namespace NetCoreServer
 	/// SSL client is used to read/write data from/into the connected SSL server
 	/// </summary>
 	/// <remarks>Thread-safe</remarks>
-	public class SslClient : IDisposable
+	public class SslClient : IHasId, IDisposable
 	{
 		/// <summary>
 		/// Initialize SSL client with a given server IP address and port number
