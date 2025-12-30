@@ -321,7 +321,7 @@ namespace NetCoreServer
 				(error == SocketError.Shutdown))
 				return;
 
-			if (a_ex != null)
+			if (a_ex != null && Logger != null)
 				Logger.Error(a_ex);
 
 			OnError(error, a_ex);
