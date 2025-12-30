@@ -136,186 +136,195 @@ namespace NetCoreServer
         /// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
         public override bool Disconnect(string a_marker)
         {
-            Logger.Information("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
-            if (!IsConnected)
-                return false;
-
-            if (_disconnecting)
-                return false;
-
-            // Update the disconnecting flag
-            _disconnecting = true;
-
             try
             {
-                // Call the session disconnecting handler
-                OnDisconnecting();
-                Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
+                Logger.Information("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
+                if (!IsConnected)
+                    return false;
 
-                // Call the session disconnecting handler in the server
-                Server.OnDisconnectingInternal(this);
+                if (_disconnecting)
+                    return false;
+
+                // Update the disconnecting flag
+                _disconnecting = true;
 
                 try
                 {
-                    // Shutdown the SSL stream
-                    _sslStream.ShutdownAsync().Wait();
+                    // Call the session disconnecting handler
+                    OnDisconnecting();
+                    Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
+
+                    // Call the session disconnecting handler in the server
+                    Server.OnDisconnectingInternal(this);
+
+                    try
+                    {
+                        // Shutdown the SSL stream
+                        _sslStream.ShutdownAsync().Wait();
+                    }
+                    catch (Exception a_ex)
+                    {
+                        Console.WriteLine($"SSLSession::Disconnect:Error");
+                        Console.WriteLine(a_ex);
+
+                        if (Logger == null)
+                        {
+                            FileUtilities.Write($"SSLSession::Disconnect1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                        }
+                        else
+                        {
+                            Logger.Error($"SSLSession::Disconnect1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                        }
+                    }
+
+                    // Dispose the SSL stream & buffer
+                    _sslStream.Dispose();
+                    _sslStreamId = null;
+
+                    try
+                    {
+                        // Shutdown the socket associated with the client
+                        Socket.Shutdown(SocketShutdown.Both);
+                    }
+                    catch (SocketException a_ex)
+                    {
+                        Console.WriteLine($"SSLSession::Disconnect1:Error");
+                        Console.WriteLine(a_ex);
+
+                        if (Logger == null)
+                        {
+                            FileUtilities.Write($"SSLSession::Disconnect2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                        }
+                        else
+                        {
+                            Logger.Error($"SSLSession::Disconnect2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                        }
+                    }
+
+                    // Close the session socket
+                    Socket.Close();
+
+                    // Dispose the session socket
+                    Socket.Dispose();
+
+                    // Update the session socket disposed flag
+                    IsSocketDisposed = true;
+                }
+                catch (ObjectDisposedException a_ex)
+                {
+                    Console.WriteLine($"SSLSession::Disconnect2:Error");
+                    Console.WriteLine(a_ex);
+
+                    if (Logger == null)
+                    {
+                        FileUtilities.Write($"SSLSession::Disconnect3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                    }
+                    else
+                    {
+                        Logger.Error($"SSLSession::Disconnect3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                    }
                 }
                 catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect:Error");
+                    Console.WriteLine($"SSLSession::Disconnect3:Error");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
                     {
-                        FileUtilities.Write($"SSLSession::Disconnect1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                        FileUtilities.Write($"SSLSession::Disconnect4:[ {(_sslStreamId == null ? "null" : _sslStreamId.ToString())}::Logger is null with exception {a_ex.Message}\n{a_ex}");
                     }
                     else
                     {
-                        Logger.Error($"SSLSession::Disconnect1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                        Logger.Error($"SSLSession::Disconnect4:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
                     }
                 }
 
-                // Dispose the SSL stream & buffer
-                _sslStream.Dispose();
-                _sslStreamId = null;
+                // Update the handshaked flag
+                IsHandshaked = false;
+
+                // Update the connected flag
+                IsConnected = false;
+
+                // Update sending/receiving flags
+                _receiving = false;
+                _sending = false;
+
+                // Clear send/receive buffers
+                ClearBuffers();
 
                 try
                 {
-                    // Shutdown the socket associated with the client
-                    Socket.Shutdown(SocketShutdown.Both);
+                    // Call the session disconnected handler
+                    OnDisconnected();
                 }
-                catch (SocketException a_ex)
+                catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect1:Error");
+                    Console.WriteLine($"SSLSession::Disconnect4:Error");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
                     {
-                        FileUtilities.Write($"SSLSession::Disconnect2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                        FileUtilities.Write($"SSLSession::Disconnect5:[ {(_sslStreamId == null ? "null" : _sslStreamId.ToString())}::Logger is null with exception {a_ex.Message}\n{a_ex}");
                     }
                     else
                     {
-                        Logger.Error($"SSLSession::Disconnect2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                        Logger.Error($"SSLSession::Disconnect5:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
                     }
                 }
 
-                // Close the session socket
-                Socket.Close();
-
-                // Dispose the session socket
-                Socket.Dispose();
-
-                // Update the session socket disposed flag
-                IsSocketDisposed = true;
-            }
-            catch (ObjectDisposedException a_ex)
-            {
-                Console.WriteLine($"SSLSession::Disconnect2:Error");
-                Console.WriteLine(a_ex);
-
-                if (Logger == null)
+                try
                 {
-                    FileUtilities.Write($"SSLSession::Disconnect3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                    Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
+
+                    // Unregister session
+                    Server.UnregisterSession(Id);
                 }
-                else
+                catch (Exception a_ex)
                 {
-                    Logger.Error($"SSLSession::Disconnect3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
-                }
-            }
-            catch (Exception a_ex)
-            {
-                Console.WriteLine($"SSLSession::Disconnect3:Error");
-                Console.WriteLine(a_ex);
+                    Console.WriteLine($"SSLSession::Disconnect5:Error");
+                    Console.WriteLine(a_ex);
 
-                if (Logger == null)
+                    if (Logger == null)
+                    {
+                        FileUtilities.Write($"SSLSession::Disconnect6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                    }
+                    else
+                    {
+                        Logger.Error($"SSLSession::Disconnect6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                    }
+                }
+
+                try
                 {
-                    FileUtilities.Write($"SSLSession::Disconnect4:[ {(_sslStreamId == null ? "null" : _sslStreamId.ToString())}::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                    // Call the session disconnected handler in the server
+                    Server.OnDisconnectedInternal(this);
                 }
-                else
+                catch (Exception a_ex)
                 {
-                    Logger.Error($"SSLSession::Disconnect4:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                    Console.WriteLine($"SSLSession::Disconnect7:Error");
+                    Console.WriteLine(a_ex);
+
+                    if (Logger == null)
+                    {
+                        FileUtilities.Write($"SSLSession::Disconnect7:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
+                    }
+                    else
+                    {
+                        Logger.Error($"SSLSession::Disconnect7:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                    }
                 }
-            }
 
-            // Update the handshaked flag
-            IsHandshaked = false;
+                // Reset the disconnecting flag
+                _disconnecting = false;
 
-            // Update the connected flag
-            IsConnected = false;
-
-            // Update sending/receiving flags
-            _receiving = false;
-            _sending = false;
-
-            // Clear send/receive buffers
-            ClearBuffers();
-
-            try
-            {
-                // Call the session disconnected handler
-                OnDisconnected();
+                return true;
             }
             catch (Exception a_ex)
             {
-                Console.WriteLine($"SSLSession::Disconnect4:Error");
+                Console.WriteLine($"SSLSession::Disconnect8:Error");
                 Console.WriteLine(a_ex);
-
-                if (Logger == null)
-                {
-                    FileUtilities.Write($"SSLSession::Disconnect5:[ {(_sslStreamId == null ? "null" : _sslStreamId.ToString())}::Logger is null with exception {a_ex.Message}\n{a_ex}");
-                }
-                else
-                {
-                    Logger.Error($"SSLSession::Disconnect5:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
-                }
             }
-
-            try
-            {
-                Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnected.", Id);
-
-                // Unregister session
-                Server.UnregisterSession(Id);
-            }
-            catch (Exception a_ex)
-            {
-                Console.WriteLine($"SSLSession::Disconnect5:Error");
-                Console.WriteLine(a_ex);
-
-                if (Logger == null)
-                {
-                    FileUtilities.Write($"SSLSession::Disconnect6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
-                }
-                else
-                {
-                    Logger.Error($"SSLSession::Disconnect6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
-                }
-            }
-
-            try
-            {
-                // Call the session disconnected handler in the server
-                Server.OnDisconnectedInternal(this);
-            }
-            catch (Exception a_ex)
-            {
-                Console.WriteLine($"SSLSession::Disconnect7:Error");
-                Console.WriteLine(a_ex);
-
-                if (Logger == null)
-                {
-                    FileUtilities.Write($"SSLSession::Disconnect7:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]::Logger is null with exception {a_ex.Message}\n{a_ex}");
-                }
-                else
-                {
-                    Logger.Error($"SSLSession::Disconnect7:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
-                }
-            }
-
-            // Reset the disconnecting flag
-            _disconnecting = false;
-
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -324,105 +333,115 @@ namespace NetCoreServer
         /// <returns>'true' if the section was successfully disconnected, 'false' if the section is already disconnected</returns>
         public override async Task<bool> DisconnectAsync(string a_marker)
         {
-            Logger.Information("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
-            if (!IsConnected)
-                return false;
-
-            if (_disconnecting)
-                return false;
-
-            // Update the disconnecting flag
-            _disconnecting = true;
-
-            // Call the session disconnecting handler
-            OnDisconnecting();
-            Logger.Debug("Client[{CLIENT_SESSION_ID}]::DisconnectingAsync.", Id);
-
-            // Call the session disconnecting handler in the server
-            Server.OnDisconnectingInternal(this);
-
             try
             {
+                Logger.Information("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
+                if (!IsConnected)
+                    return false;
+
+                if (_disconnecting)
+                    return false;
+
+                // Update the disconnecting flag
+                _disconnecting = true;
+
+                // Call the session disconnecting handler
+                OnDisconnecting();
+                Logger.Debug("Client[{CLIENT_SESSION_ID}]::DisconnectingAsync.", Id);
+
+                // Call the session disconnecting handler in the server
+                Server.OnDisconnectingInternal(this);
+
                 try
                 {
-                    // Shutdown the SSL stream
-                    _sslStream.ShutdownAsync().Wait();
+                    try
+                    {
+                        // Shutdown the SSL stream
+                        _sslStream.ShutdownAsync().Wait();
+                    }
+                    catch (Exception a_ex)
+                    {
+                        Console.WriteLine($"SSLSession::DisconnectAsync:Error");
+                        Console.WriteLine(a_ex);
+
+                        Logger.Error($"SSLSession::DisconnectAsync1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                    }
+
+                    // Dispose the SSL stream & buffer
+                    _sslStream.Dispose();
+                    _sslStreamId = null;
+
+                    try
+                    {
+                        // Shutdown the socket associated with the client
+                        Socket.Shutdown(SocketShutdown.Both);
+                    }
+                    catch (SocketException a_ex)
+                    {
+                        Console.WriteLine($"SSLSession::DisconnectAsync1:Error");
+                        Console.WriteLine(a_ex);
+
+                        Logger.Error($"SSLSession::DisconnectAsync2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                    }
+
+                    // Close the session socket
+                    Socket.Close();
+
+                    // Dispose the session socket
+                    Socket.Dispose();
+
+                    // Update the session socket disposed flag
+                    IsSocketDisposed = true;
+                }
+                catch (ObjectDisposedException a_ex)
+                {
+                    Console.WriteLine($"SSLSession::DisconnectAsync3:");
+                    Console.WriteLine(a_ex);
+
+                    Logger.Error($"SSLSession::DisconnectAsync3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
                 }
                 catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::DisconnectAsync:Error");
+                    Console.WriteLine($"SSLSession::DisconnectAsync4:");
                     Console.WriteLine(a_ex);
-
-                    Logger.Error($"SSLSession::DisconnectAsync1:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
                 }
 
-                // Dispose the SSL stream & buffer
-                _sslStream.Dispose();
-                _sslStreamId = null;
+                // Update the handshaked flag
+                IsHandshaked = false;
 
-                try
-                {
-                    // Shutdown the socket associated with the client
-                    Socket.Shutdown(SocketShutdown.Both);
-                }
-                catch (SocketException a_ex)
-                {
-                    Console.WriteLine($"SSLSession::DisconnectAsync1:Error");
-                    Console.WriteLine(a_ex);
+                // Update the connected flag
+                IsConnected = false;
 
-                    Logger.Error($"SSLSession::DisconnectAsync2:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
-                }
+                // Update sending/receiving flags
+                _receiving = false;
+                _sending = false;
 
-                // Close the session socket
-                Socket.Close();
+                // Clear send/receive buffers
+                ClearBuffers();
 
-                // Dispose the session socket
-                Socket.Dispose();
+                // Call the session disconnected handler
+                OnDisconnected();
 
-                // Update the session socket disposed flag
-                IsSocketDisposed = true;
-            }
-            catch (ObjectDisposedException a_ex)
-            {
-                Console.WriteLine($"SSLSession::DisconnectAsync3:");
-                Console.WriteLine(a_ex);
+                Logger.Debug("Client[{CLIENT_SESSION_ID}]:: DisconnectedAsync.", Id);
 
-                Logger.Error($"SSLSession::DisconnectAsync3:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                // Unregister session
+                Server.UnregisterSession(Id);
+
+                // Call the session disconnected handler in the server
+                await Server.OnDisconnectedInternalAsync(this);
+
+                // Reset the disconnecting flag
+                _disconnecting = false;
+
+                return true;
             }
             catch (Exception a_ex)
             {
-                Console.WriteLine($"SSLSession::DisconnectAsync4:");
+                Console.WriteLine($"SSLSession::DisconnectAsync8:Error");
                 Console.WriteLine(a_ex);
+                if (Logger != null) Logger.Error($"SSLSession::DisconnectAsync8:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
             }
-
-            // Update the handshaked flag
-            IsHandshaked = false;
-
-            // Update the connected flag
-            IsConnected = false;
-
-            // Update sending/receiving flags
-            _receiving = false;
-            _sending = false;
-
-            // Clear send/receive buffers
-            ClearBuffers();
-
-            // Call the session disconnected handler
-            OnDisconnected();
-
-            Logger.Debug("Client[{CLIENT_SESSION_ID}]:: DisconnectedAsync.", Id);
-
-            // Unregister session
-            Server.UnregisterSession(Id);
-
-            // Call the session disconnected handler in the server
-            await Server.OnDisconnectedInternalAsync(this);
-
-            // Reset the disconnecting flag
-            _disconnecting = false;
-
-            return true;
+            return false;
         }
 
         #endregion
@@ -785,6 +804,21 @@ namespace NetCoreServer
                 catch (Exception a_ex1)
                 {
                     Console.WriteLine($"SSLSession::ProcessReceive3:Error");
+                    Console.WriteLine(a_ex1);
+                }
+            }
+            catch (ObjectDisposedException a_ex)
+            {
+                Console.WriteLine($"SSLSession::ProcessReceive6:Error");
+                Console.WriteLine(a_ex);
+                if (Logger != null) Logger.Error($"SSLSession::ProcessReceive6:[{(_sslStreamId == null ? "null" : _sslStreamId.ToString())}]", a_ex);
+                try
+                {
+                    Disconnect("SSLSession::ProcessReceive6");
+                }
+                catch (Exception a_ex1)
+                {
+                    Console.WriteLine($"SSLSession::ProcessReceive7:Error");
                     Console.WriteLine(a_ex1);
                 }
             }
