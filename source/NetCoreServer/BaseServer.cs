@@ -297,13 +297,46 @@ namespace NetCoreServer
                 ProcessAccept(e);
         }
 
+        private int m_currCount;
+        private long m_windowTicks = DateTime.UtcNow.Ticks;
+        private readonly object m_rateLock = new();
+        private const int MaxPerWindow = 300;
+        private static readonly TimeSpan Window = TimeSpan.FromSeconds(5);
+        private Task<bool> TryEnterRateLimitAsync()
+        {
+            lock (m_rateLock)
+            {
+                long now = DateTime.UtcNow.Ticks;
+                if (now - m_windowTicks > Window.Ticks)
+                {
+                    m_windowTicks = now;
+                    m_currCount = 0;
+                }
+
+                if (m_currCount >= MaxPerWindow)
+                    return Task.FromResult(false);
+
+                m_currCount++;
+                return Task.FromResult(true);
+            }
+        }
+
         /// <summary>
         /// Process accepted client connection
         /// </summary>
-        private void ProcessAccept(SocketAsyncEventArgs e)
+        private async void ProcessAccept(SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success)
             {
+                // RATE LIMIT HERE (after accept)
+                if (!await TryEnterRateLimitAsync())
+                {
+                    // Reject connection cleanly
+                    e.AcceptSocket.Close();
+                    StartAccept(e);
+                    return;
+                }
+
                 // Create a new session to register
                 SESSION_TYPE session = CreateSession();
 
