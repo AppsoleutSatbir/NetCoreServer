@@ -164,7 +164,7 @@ namespace NetCoreServer
                     }
                     catch (Exception a_ex)
                     {
-                        Console.WriteLine($"SSLSession::Disconnect:Error");
+                        Console.WriteLine($"SSLSession::Disconnect:Error.{a_marker}");
                         Console.WriteLine(a_ex);
 
                         if (Logger == null)
@@ -188,7 +188,7 @@ namespace NetCoreServer
                     }
                     catch (SocketException a_ex)
                     {
-                        Console.WriteLine($"SSLSession::Disconnect1:Error");
+                        Console.WriteLine($"SSLSession::Disconnect1:Error.{a_marker}");
                         Console.WriteLine(a_ex);
 
                         if (Logger == null)
@@ -212,7 +212,7 @@ namespace NetCoreServer
                 }
                 catch (ObjectDisposedException a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect2:Error");
+                    Console.WriteLine($"SSLSession::Disconnect2:Error.{a_marker}");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
@@ -226,7 +226,7 @@ namespace NetCoreServer
                 }
                 catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect3:Error");
+                    Console.WriteLine($"SSLSession::Disconnect3:Error.{a_marker}");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
@@ -259,7 +259,7 @@ namespace NetCoreServer
                 }
                 catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect4:Error");
+                    Console.WriteLine($"SSLSession::Disconnect4:Error.{a_marker}");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
@@ -281,7 +281,7 @@ namespace NetCoreServer
                 }
                 catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect5:Error");
+                    Console.WriteLine($"SSLSession::Disconnect5:Error.{a_marker}");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
@@ -301,7 +301,7 @@ namespace NetCoreServer
                 }
                 catch (Exception a_ex)
                 {
-                    Console.WriteLine($"SSLSession::Disconnect7:Error");
+                    Console.WriteLine($"SSLSession::Disconnect7:Error.{a_marker}");
                     Console.WriteLine(a_ex);
 
                     if (Logger == null)
@@ -321,7 +321,7 @@ namespace NetCoreServer
             }
             catch (Exception a_ex)
             {
-                Console.WriteLine($"SSLSession::Disconnect8:Error");
+                Console.WriteLine($"SSLSession::Disconnect8:Error.{a_marker}");
                 Console.WriteLine(a_ex);
             }
             return false;
