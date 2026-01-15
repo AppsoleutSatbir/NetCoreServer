@@ -31,4 +31,8 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Dev|AnyCPU'">
 		<NoWarn>1701;1702;8600;8601;8602;8603;8604;8618;8625</NoWarn>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Utilities\Utilities\Utilities.csproj" />
+	</ItemGroup>
 </Project>
