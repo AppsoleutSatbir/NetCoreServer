@@ -148,7 +148,7 @@ namespace NetCoreServer
 				MinThreads = CONN_ACCEPTOR_WORKER_MIN_COUNT,
 				MaxThreads = CONN_ACCEPTOR_WORKER_MAX_COUNT,
 				BoundedCapacity = null,
-				IdleTimeout = TimeSpan.FromMinutes(CONN_ACCEPTOR_WORKER_THREAD_IDLE_TIMEOUT_MINUTES)
+				ThreadIdleTimeout = TimeSpan.FromMinutes(CONN_ACCEPTOR_WORKER_THREAD_IDLE_TIMEOUT_MINUTES)
 			}, Logger);
 
 			m_conAcceptWorkerDiagnostics = (IWorkerGroupDiagnostics)m_conAcceptWorker;
@@ -349,7 +349,7 @@ namespace NetCoreServer
 		private async Task ProcessAcceptAsync(SocketAsyncEventArgs e)
 		{
 			// Diagnostics: we're on accept worker when entered from RunSync; after await we may be on thread pool.
-			TaskSchedulerDiagnostics.EnsureCurrentThreadIsWorker("AcceptProcessing", m_conAcceptWorkerDiagnostics);
+			TaskSchedulerDiagnostics.EnsureCurrentThreadIsWorker("AcceptProcessingStart", m_conAcceptWorkerDiagnostics);
 
 			if (e.SocketError == SocketError.Success)
 			{
@@ -407,9 +407,10 @@ namespace NetCoreServer
 				SendError(e.SocketError, e.ConnectByNameError);
 			}
 
+			TaskSchedulerDiagnostics.EnsureCurrentThreadIsWorker("AcceptProcessingEnd", m_conAcceptWorkerDiagnostics);
 			// Accept the next client connection
 			if (IsAccepting)
-				m_conAcceptWorker.RunSync(() => StartAccept(e));
+				StartAccept(e);
 		}
 
 		/// <summary>
