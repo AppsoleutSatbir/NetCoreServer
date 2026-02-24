@@ -4,8 +4,14 @@ using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
-	public interface IHasId { Guid Id { get; } }
-	public interface IBaseSession : IHasId, IDisposable
+	public interface IPacketReceiver
+	{
+		Guid Id { get; }
+		Buffer ReceivedBuffer { get; }
+		Buffer ProcessBuffer { get; }
+	}
+
+	public interface IBaseSession : IPacketReceiver, IDisposable
 	{
 		IBaseServer ServerRef { get; }
 

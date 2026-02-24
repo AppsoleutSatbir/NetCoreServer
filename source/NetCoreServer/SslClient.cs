@@ -13,7 +13,7 @@ namespace NetCoreServer
 	/// SSL client is used to read/write data from/into the connected SSL server
 	/// </summary>
 	/// <remarks>Thread-safe</remarks>
-	public class SslClient : IHasId, IDisposable
+	public class SslClient : IPacketReceiver, IDisposable
 	{
 		/// <summary>
 		/// Initialize SSL client with a given server IP address and port number
@@ -159,6 +159,11 @@ namespace NetCoreServer
 		/// Option: send buffer size
 		/// </summary>
 		public int OptionSendBufferSize { get; set; } = 8192;
+
+		private readonly Buffer m_IPacketReceiver_ReceivedBuffer = new Buffer(32768); //Initial size 32KB, will grow as needed.
+		private readonly Buffer m_IPacketReceiver_ProcessBuffer = new Buffer(32768); //Initial size 32KB, will grow as needed.
+		Buffer IPacketReceiver.ReceivedBuffer { get { return m_IPacketReceiver_ReceivedBuffer; } }
+		Buffer IPacketReceiver.ProcessBuffer { get { return m_IPacketReceiver_ProcessBuffer; } }
 
 		#region Connect/Disconnect client
 
