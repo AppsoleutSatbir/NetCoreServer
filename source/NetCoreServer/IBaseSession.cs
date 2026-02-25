@@ -30,6 +30,10 @@ namespace NetCoreServer
 		/// </summary>
 		Buffer ProcessBuffer { get; }
 
+		/// <summary>
+		/// Gets a reference to an integer indicating whether the parser is active.
+		/// </summary>
+		ref int ParserActive { get; }
 	}
 
 	public interface IBaseSession : IPacketReceiver, IDisposable

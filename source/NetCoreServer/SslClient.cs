@@ -163,9 +163,11 @@ namespace NetCoreServer
 		private readonly Buffer m_IPacketReceiver_ReceivedBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
 		private readonly Buffer m_IPacketReceiver_IntermediateBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
 		private readonly Buffer m_IPacketReceiver_ProcessBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
+		private int m_IPacketReceiver_ParserActive = 0;
 		Buffer IPacketReceiver.ReceivedBuffer { get { return m_IPacketReceiver_ReceivedBuffer; } }
 		Buffer IPacketReceiver.IntermediateBuffer { get { return m_IPacketReceiver_IntermediateBuffer; } }
 		Buffer IPacketReceiver.ProcessBuffer { get { return m_IPacketReceiver_ProcessBuffer; } }
+		ref int IPacketReceiver.ParserActive { get { return ref m_IPacketReceiver_ParserActive; } }
 
 		#region Connect/Disconnect client
 
