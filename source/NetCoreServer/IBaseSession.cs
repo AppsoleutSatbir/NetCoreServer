@@ -4,11 +4,32 @@ using System.Threading.Tasks;
 
 namespace NetCoreServer
 {
+	/// <summary>
+	/// Defines an interface for entities that receive packets, providing access to unique identification and various data
+	/// buffers.
+	/// </summary>
 	public interface IPacketReceiver
 	{
+		/// <summary>
+		/// Gets the unique identifier for the entity.
+		/// </summary>
 		Guid Id { get; }
+
+		/// <summary>
+		/// Gets the buffer containing received data.
+		/// </summary>
 		Buffer ReceivedBuffer { get; }
+
+		/// <summary>
+		/// Gets the intermediate buffer used for temporary data storage.
+		/// </summary>
+		Buffer IntermediateBuffer { get; }
+
+		/// <summary>
+		/// Gets the buffer used for processing operations.
+		/// </summary>
 		Buffer ProcessBuffer { get; }
+
 	}
 
 	public interface IBaseSession : IPacketReceiver, IDisposable

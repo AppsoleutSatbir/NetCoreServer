@@ -56,9 +56,11 @@ namespace NetCoreServer
 		/// </summary>
 		public int OptionSendBufferSize { get; protected set; } = 8192;
 
-		private readonly Buffer m_IPacketReceiver_ReceivedBuffer = new Buffer(32768); //Initial size 32KB, will grow as needed.
-		private readonly Buffer m_IPacketReceiver_ProcessBuffer = new Buffer(32768); //Initial size 32KB, will grow as needed.
+		private readonly Buffer m_IPacketReceiver_ReceivedBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
+		private readonly Buffer m_IPacketReceiver_IntermediateBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
+		private readonly Buffer m_IPacketReceiver_ProcessBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
 		Buffer IPacketReceiver.ReceivedBuffer { get { return m_IPacketReceiver_ReceivedBuffer; } }
+		Buffer IPacketReceiver.IntermediateBuffer { get { return m_IPacketReceiver_IntermediateBuffer; } }
 		Buffer IPacketReceiver.ProcessBuffer { get { return m_IPacketReceiver_ProcessBuffer; } }
 
 		internal BaseSession()
