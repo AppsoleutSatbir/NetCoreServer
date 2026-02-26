@@ -42,7 +42,7 @@ namespace NetCoreServer
 		/// <summary>
 		/// Option: receive buffer limit
 		/// </summary>
-		public int OptionReceiveBufferLimit { get; protected set; } = 0;
+		public int OptionReceiveBufferLimit { get; set; } = 0;
 		/// <summary>
 		/// Option: receive buffer size
 		/// </summary>
@@ -50,7 +50,7 @@ namespace NetCoreServer
 		/// <summary>
 		/// Option: send buffer limit
 		/// </summary>
-		public int OptionSendBufferLimit { get; protected set; } = 0;
+		public int OptionSendBufferLimit { get; set; } = 0;
 		/// <summary>
 		/// Option: send buffer size
 		/// </summary>
