@@ -157,9 +157,9 @@ namespace NetCoreServer
 					// Call the session disconnecting handler
 					OnDisconnecting();
 					if (Logger == null)
-						Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting.", Id);
+						Logger.Debug("Client[{CLIENT_SESSION_ID}]:: Disconnecting. Marker '{Marker}'", Id, a_marker);
 					else
-						Console.WriteLine("Client[{0}]:: Disconnecting.", Id);
+						Console.WriteLine("Client[{0}]:: Disconnecting. Marker '{1}'", Id, a_marker);
 
 					// Call the session disconnecting handler in the server
 					Server.OnDisconnectingInternal(this);
