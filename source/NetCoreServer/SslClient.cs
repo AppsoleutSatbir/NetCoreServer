@@ -270,7 +270,7 @@ namespace NetCoreServer
 				_connectEventArg.Dispose();
 
 				// Call the client disconnected handler
-				OnDisconnected("SSLClient::Connect::Exception");
+				OnDisconnected("SSLClient::Connect::Exception", ESocketDisconnectedReason.Exception);
 
 				return false;
 			}
@@ -328,7 +328,7 @@ namespace NetCoreServer
 				Console.WriteLine(a_ex);
 
 				SendError(SocketError.NotConnected, a_ex);
-				DisconnectAsync("SSLClient::Connect::Exception");
+				DisconnectAsync("SSLClient::Connect::Exception", ESocketDisconnectedReason.Exception);
 				return false;
 			}
 
@@ -352,15 +352,16 @@ namespace NetCoreServer
 
 		public virtual bool Disconnect()
 		{
-			return Disconnect("SSLClient::Disconnect::Unknown");
+			return Disconnect("SSLClient::Disconnect::Unknown", ESocketDisconnectedReason.Unknown);
 		}
 
 		/// <summary>
 		/// Disconnect the client (synchronous)
 		/// </summary>
 		/// <param name="a_marker">Marker for the disconnect reason</param>
+		/// <param name="a_reason">Reason for the disconnect</param>
 		/// <returns>'true' if the client was successfully disconnected, 'false' if the client is already disconnected</returns>
-		public virtual bool Disconnect(string a_marker)
+		public virtual bool Disconnect(string a_marker, ESocketDisconnectedReason a_reason)
 		{
 			if (!IsConnected && !IsConnecting)
 				return false;
@@ -445,7 +446,7 @@ namespace NetCoreServer
 			ClearBuffers();
 
 			// Call the client disconnected handler
-			OnDisconnected(a_marker);
+			OnDisconnected(a_marker, a_reason);
 
 			// Reset the disconnecting flag
 			_disconnecting = false;
@@ -459,7 +460,7 @@ namespace NetCoreServer
 		/// <returns>'true' if the client was successfully reconnected, 'false' if the client is already reconnected</returns>
 		public virtual bool Reconnect()
 		{
-			if (!Disconnect("SSLClient::Reconnect"))
+			if (!Disconnect("SSLClient::Reconnect", ESocketDisconnectedReason.Reconnect))
 				return false;
 
 			return Connect();
@@ -511,15 +512,16 @@ namespace NetCoreServer
 		/// Disconnect the client (asynchronous)
 		/// </summary>
 		/// <returns>'true' if the client was successfully disconnected, 'false' if the client is already disconnected</returns>
-		[Obsolete("DisconnectAsync() is obsolete. Use DisconnectAsync(string a_marker) instead.", false)]
+		[Obsolete("DisconnectAsync() is obsolete. Use DisconnectAsync(string a_marker, ESocketDisconnectedReason a_reason) instead.", false)]
 		public virtual bool DisconnectAsync() => Disconnect();
 
 		/// <summary>
 		/// Disconnect the client (asynchronous)
 		/// </summary>
 		/// <param name="a_marker">Marker for the disconnect reason</param>
+		/// <param name="a_reason">Reason for the disconnect</param>
 		/// <returns>'true' if the client was successfully disconnected, 'false' if the client is already disconnected</returns>
-		public virtual bool DisconnectAsync(string a_marker) => Disconnect(a_marker);
+		public virtual bool DisconnectAsync(string a_marker, ESocketDisconnectedReason a_reason) => Disconnect(a_marker, a_reason);
 
 		/// <summary>
 		/// Reconnect the client (asynchronous)
@@ -527,7 +529,7 @@ namespace NetCoreServer
 		/// <returns>'true' if the client was successfully reconnected, 'false' if the client is already reconnected</returns>
 		public virtual bool ReconnectAsync()
 		{
-			if (!DisconnectAsync("SSLClient::ReconnectAsync"))
+			if (!DisconnectAsync("SSLClient::ReconnectAsync", ESocketDisconnectedReason.Reconnect))
 				return false;
 
 			while (IsConnected)
@@ -600,7 +602,7 @@ namespace NetCoreServer
 				Console.WriteLine(a_ex);
 
 				SendError(SocketError.OperationAborted, a_ex);
-				Disconnect("SSLClient::Send::Exception");
+				Disconnect("SSLClient::Send::Exception", ESocketDisconnectedReason.OperationAborted);
 				return 0;
 			}
 		}
@@ -733,7 +735,7 @@ namespace NetCoreServer
 				Console.WriteLine(a_ex);
 
 				SendError(SocketError.OperationAborted, a_ex);
-				Disconnect("SSLClient::Receive::Exception");
+				Disconnect("SSLClient::Receive::Exception", ESocketDisconnectedReason.OperationAborted);
 				return 0;
 			}
 		}
@@ -962,7 +964,7 @@ namespace NetCoreServer
 					Console.WriteLine(a_ex);
 
 					SendError(SocketError.NotConnected, a_ex);
-					DisconnectAsync("SSLClient::ProcessConnect::Exception");
+					DisconnectAsync("SSLClient::ProcessConnect::Exception", GetSocketDisconnectedReason(SocketError.NotConnected));
 				}
 			}
 			else
@@ -971,7 +973,7 @@ namespace NetCoreServer
 
 				// Call the client disconnected handler
 				SendError(e.SocketError);
-				OnDisconnected($"SSLClient::ProcessConnect::{e.SocketError}");
+				OnDisconnected($"SSLClient::ProcessConnect::{e.SocketError}", GetSocketDisconnectedReason(e.SocketError));
 			}
 		}
 
@@ -1018,7 +1020,7 @@ namespace NetCoreServer
 				Console.WriteLine(a_ex);
 
 				SendError(SocketError.NotConnected, a_ex);
-				DisconnectAsync("SSLClient::ProcessHandshake::Exception");
+				DisconnectAsync("SSLClient::ProcessHandshake::Exception", GetSocketDisconnectedReason(SocketError.NotConnected));
 			}
 		}
 
@@ -1056,7 +1058,7 @@ namespace NetCoreServer
 						if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
 						{
 							SendError(SocketError.NoBufferSpaceAvailable);
-							DisconnectAsync("SSLClient::ProcessReceive::NoBufferSpaceAvailable");
+							DisconnectAsync("SSLClient::ProcessReceive::NoBufferSpaceAvailable", GetSocketDisconnectedReason(SocketError.NoBufferSpaceAvailable));
 							return;
 						}
 
@@ -1073,7 +1075,7 @@ namespace NetCoreServer
 						TryReceive();
 				}
 				else
-					DisconnectAsync("SSLClient::ProcessReceive::size zero");
+					DisconnectAsync("SSLClient::ProcessReceive::size zero", ESocketDisconnectedReason.SizeZero);
 			}
 			catch (Exception a_ex)
 			{
@@ -1081,7 +1083,7 @@ namespace NetCoreServer
 				Console.WriteLine(a_ex);
 
 				SendError(SocketError.OperationAborted, a_ex);
-				DisconnectAsync("SSLClient::ProcessReceive::Exception");
+				DisconnectAsync("SSLClient::ProcessReceive::Exception", ESocketDisconnectedReason.Exception);
 			}
 		}
 
@@ -1136,13 +1138,36 @@ namespace NetCoreServer
 				Console.WriteLine(a_ex);
 
 				SendError(SocketError.OperationAborted, a_ex);
-				DisconnectAsync("SSLClient::ProcessSend::Exception");
+				DisconnectAsync("SSLClient::ProcessSend::Exception", ESocketDisconnectedReason.Exception);
 			}
 		}
 
 		#endregion
 
 		#region Session handlers
+
+		/// <summary>
+		/// Socket disconnected reason.
+		/// </summary>
+		public enum ESocketDisconnectedReason : ushort
+		{
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+			Unknown,
+			Unhandled,
+			Exception,
+			Reconnect,
+			SizeZero,
+			Disposed,
+			Manual,
+			ConnectionRefused = SocketError.ConnectionRefused,
+			ConnectionReset = SocketError.ConnectionReset,
+			NotConnected = SocketError.NotConnected,
+			NoBufferSpaceAvailable = SocketError.NoBufferSpaceAvailable,
+			OperationAborted = SocketError.OperationAborted,
+			ConnectionAborted = SocketError.ConnectionAborted,
+			Shutdown = SocketError.Shutdown,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+		}
 
 		/// <summary>
 		/// Handle client connecting notification
@@ -1167,12 +1192,12 @@ namespace NetCoreServer
 		/// <summary>
 		/// Handle client disconnected notification
 		/// </summary>
-		protected virtual void OnDisconnected(string a_marker) { }
+		protected virtual void OnDisconnected(string a_marker, ESocketDisconnectedReason a_reason) { }
 
 		/// <summary>
 		///	Handle client disconnected notification (obsolete)
 		///	</summary>
-		[Obsolete("OnDisconnected() is obsolete. Use OnDisconnected(string a_marker) instead.", false)]
+		[Obsolete("OnDisconnected() is obsolete. Use OnDisconnected(string a_marker, ESocketDisconnectedReason a_reason) instead.", false)]
 		protected virtual void OnDisconnected() { }
 
 		/// <summary>
@@ -1234,6 +1259,21 @@ namespace NetCoreServer
 			OnError(error, ex);
 		}
 
+		private ESocketDisconnectedReason GetSocketDisconnectedReason(SocketError error)
+		{
+			return error switch
+			{
+				SocketError.NotConnected => ESocketDisconnectedReason.NotConnected,
+				SocketError.NoBufferSpaceAvailable => ESocketDisconnectedReason.NoBufferSpaceAvailable,
+				SocketError.ConnectionAborted => ESocketDisconnectedReason.ConnectionAborted,
+				SocketError.ConnectionRefused => ESocketDisconnectedReason.ConnectionRefused,
+				SocketError.ConnectionReset => ESocketDisconnectedReason.ConnectionReset,
+				SocketError.OperationAborted => ESocketDisconnectedReason.OperationAborted,
+				SocketError.Shutdown => ESocketDisconnectedReason.Shutdown,
+				_ => ESocketDisconnectedReason.Unhandled,
+			};
+		}
+
 		#endregion
 
 		#region IDisposable implementation
@@ -1274,7 +1314,7 @@ namespace NetCoreServer
 				if (disposingManagedResources)
 				{
 					// Dispose managed resources here...
-					DisconnectAsync("SSLClient::Dispose");
+					DisconnectAsync("SSLClient::Dispose", ESocketDisconnectedReason.Disposed);
 				}
 
 				// Dispose unmanaged resources here...
