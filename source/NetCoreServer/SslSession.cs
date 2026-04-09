@@ -787,7 +787,7 @@ namespace NetCoreServer
 						if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
 						{
 							SendError(SocketError.NoBufferSpaceAvailable);
-							Disconnect("SSLSession::ProcessReceive::ReceiveBufferLimitReached");
+							Disconnect($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
 							return;
 						}
 
