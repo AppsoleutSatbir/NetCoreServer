@@ -302,7 +302,7 @@ namespace NetCoreServer
         private readonly object m_rateLock = new();
         private const int MaxPerWindow = 300;
         private static readonly TimeSpan Window = TimeSpan.FromSeconds(5);
-        private Task<bool> TryEnterRateLimitAsync()
+		private bool TryEnterRateLimitAsync()
         {
             lock (m_rateLock)
             {
@@ -314,22 +314,22 @@ namespace NetCoreServer
                 }
 
                 if (m_currCount >= MaxPerWindow)
-                    return Task.FromResult(false);
+					return false;
 
                 m_currCount++;
-                return Task.FromResult(true);
+				return true;
             }
         }
 
         /// <summary>
         /// Process accepted client connection
         /// </summary>
-        private async void ProcessAccept(SocketAsyncEventArgs e)
+		private void ProcessAccept(SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success)
             {
                 // RATE LIMIT HERE (after accept)
-                if (!await TryEnterRateLimitAsync())
+				if (!TryEnterRateLimitAsync())
                 {
                     // Reject connection cleanly
                     e.AcceptSocket.Close();
