@@ -130,6 +130,7 @@ namespace NetCoreServer
 		public event Action Event_OnStarted;
 		public event Action Event_OnStopping;
 		public event Action Event_OnStopped;
+		public event Func<SocketAsyncEventArgs, bool> Func_AcceptConnection;
 
 		public event Action<SocketError, Exception> Event_OnError;
 		//public event Action<byte[], long, long> Event_OnReceivedData;
