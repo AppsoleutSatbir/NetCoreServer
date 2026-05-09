@@ -43,7 +43,9 @@ namespace NetCoreServer
 		/// <summary>
 		/// Session Id
 		/// </summary>
-		//Guid Id { get; }
+		Guid Id { get; }
+
+		string IdStr { get; }
 
 		/// <summary>
 		/// Socket

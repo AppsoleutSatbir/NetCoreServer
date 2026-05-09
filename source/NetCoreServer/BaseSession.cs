@@ -11,11 +11,13 @@ namespace NetCoreServer
 		public IBaseServer ServerRef { get; private set; }
 
 		protected ILogger Logger { get; private set; }
-
+		Guid m_Id;
+		string m_IdStr;
 		/// <summary>
 		/// Session Id
 		/// </summary>
-		public Guid Id { get; }
+		public Guid Id { get { return m_Id; } set { m_Id = value; m_IdStr = value.ToString(); } }
+		public string IdStr { get { return m_IdStr; } }
 
 		/// <summary>
 		/// Socket
