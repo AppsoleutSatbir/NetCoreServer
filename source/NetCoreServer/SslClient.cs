@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.Utilities.Time;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -99,6 +100,18 @@ namespace NetCoreServer
 		/// Number of bytes received by the client
 		/// </summary>
 		public long BytesReceived { get; private set; }
+		/// <summary>
+		/// Timestamp when the connection was established.
+		/// </summary>
+		public long ConnectedAt { get; protected set; }
+		/// <summary>
+		/// Timestamp when the last packet was sent.
+		/// </summary>
+		public long LastPacketSentAt { get; protected set; }
+		/// <summary>
+		/// Timestamp when the last packet was received.
+		/// </summary>
+		public long LastPacketReceivedAt { get; protected set; }
 
 		/// <summary>
 		/// Option: dual mode socket
@@ -303,7 +316,7 @@ namespace NetCoreServer
 			IsConnected = true;
 
 			// Call the client connected handler
-			OnConnected();
+			OnConnected_Internal();
 
 			try
 			{
@@ -592,7 +605,7 @@ namespace NetCoreServer
 				BytesSent += sent;
 
 				// Call the buffer sent handler
-				OnSent(sent, BytesPending + BytesSending);
+				OnSent_Internal(sent, BytesPending + BytesSending);
 
 				return sent;
 			}
@@ -724,7 +737,7 @@ namespace NetCoreServer
 					BytesReceived += received;
 
 					// Call the buffer received handler
-					OnReceived(buffer, 0, received);
+					OnReceived_Internal(buffer, 0, received);
 				}
 
 				return received;
@@ -938,7 +951,7 @@ namespace NetCoreServer
 				IsConnected = true;
 
 				// Call the client connected handler
-				OnConnected();
+				OnConnected_Internal();
 
 				try
 				{
@@ -1049,7 +1062,7 @@ namespace NetCoreServer
 					BytesReceived += size;
 
 					// Call the buffer received handler
-					OnReceived(_receiveBuffer.Data, 0, size);
+					OnReceived_Internal(_receiveBuffer.Data, 0, size);
 
 					// If the receive buffer is full increase its size
 					if (_receiveBuffer.Capacity == size)
@@ -1126,7 +1139,7 @@ namespace NetCoreServer
 					}
 
 					// Call the buffer sent handler
-					OnSent(size, BytesPending + BytesSending);
+					OnSent_Internal(size, BytesPending + BytesSending);
 				}
 
 				// Try to send again if the client is valid
@@ -1173,6 +1186,12 @@ namespace NetCoreServer
 		/// Handle client connecting notification
 		/// </summary>
 		protected virtual void OnConnecting() { }
+
+		private void OnConnected_Internal()
+		{
+			ConnectedAt = DateTimeUtil.CurrentTimeUnixTicks();
+			OnConnected();
+		}
 		/// <summary>
 		/// Handle client connected notification
 		/// </summary>
@@ -1200,6 +1219,12 @@ namespace NetCoreServer
 		[Obsolete("OnDisconnected() is obsolete. Use OnDisconnected(string a_marker, ESocketDisconnectedReason a_reason) instead.", false)]
 		protected virtual void OnDisconnected() { }
 
+
+		private void OnReceived_Internal(byte[] a_buffer, long a_offset, long a_size)
+		{
+			LastPacketReceivedAt = DateTimeUtil.CurrentTimeUnixTicks();
+			OnReceived(a_buffer, a_offset, a_size);
+		}
 		/// <summary>
 		/// Handle buffer received notification
 		/// </summary>
@@ -1210,6 +1235,12 @@ namespace NetCoreServer
 		/// Notification is called when another part of buffer was received from the server
 		/// </remarks>
 		protected virtual void OnReceived(byte[] buffer, long offset, long size) { }
+
+		private void OnSent_Internal(long a_size, long a_pending)
+		{
+			LastPacketSentAt = DateTimeUtil.CurrentTimeUnixTicks();
+			OnSent(a_size, a_pending);
+		}
 		/// <summary>
 		/// Handle buffer sent notification
 		/// </summary>
