@@ -1,3 +1,4 @@
+using AC.Utilities.Time;
 using System;
 using System.Net.Sockets;
 using System.Threading;
@@ -81,6 +82,7 @@ namespace NetCoreServer
 
 			// Update the connected flag
 			IsConnected = true;
+			ConnectedAt = DateTimeUtil.CurrentTimeUnixTicks();
 
 			// Try to receive something from the client
 			TryReceive();
@@ -199,6 +201,7 @@ namespace NetCoreServer
 
 				// Call the buffer sent handler
 				OnSent(sent, BytesPending + BytesSending);
+				LastPacketSentAt = DateTimeUtil.CurrentTimeUnixTicks();
 			}
 
 			// Check for socket error
@@ -275,6 +278,7 @@ namespace NetCoreServer
 
 				// Call the buffer received handler
 				OnReceived(buffer, 0, received);
+				LastPacketReceivedAt = DateTimeUtil.CurrentTimeUnixTicks();
 			}
 
 			// Check for socket error

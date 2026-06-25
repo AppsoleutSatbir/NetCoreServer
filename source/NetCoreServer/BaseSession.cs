@@ -67,6 +67,9 @@ namespace NetCoreServer
 		Buffer IPacketReceiver.ProcessBuffer { get { return m_IPacketReceiver_ProcessBuffer; } }
 		ref int IPacketReceiver.ParserActive { get { return ref m_IPacketReceiver_ParserActive; } }
 
+		public long ConnectedAt { get; protected set; }
+		public long LastPacketSentAt { get; protected set; }
+		public long LastPacketReceivedAt { get; protected set; }
 
 		internal BaseSession()
 		{

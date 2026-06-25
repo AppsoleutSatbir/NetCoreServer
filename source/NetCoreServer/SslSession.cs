@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AC.Utilities.Time;
+using System;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -87,6 +88,7 @@ namespace NetCoreServer
 
 			// Update the connected flag
 			IsConnected = true;
+			ConnectedAt = DateTimeUtil.CurrentTimeUnixTicks();
 
 			// Call the session connected handler
 			OnConnected();
@@ -489,6 +491,7 @@ namespace NetCoreServer
 
 				// Call the buffer sent handler
 				OnSent(sent, BytesPending + BytesSending);
+				LastPacketSentAt = DateTimeUtil.CurrentTimeUnixTicks();
 
 				return sent;
 			}
@@ -572,6 +575,7 @@ namespace NetCoreServer
 
 					// Call the buffer received handler
 					OnReceived(buffer, 0, received);
+					LastPacketReceivedAt = DateTimeUtil.CurrentTimeUnixTicks();
 				}
 
 				return received;

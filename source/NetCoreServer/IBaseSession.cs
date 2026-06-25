@@ -38,13 +38,14 @@ namespace NetCoreServer
 
 	public interface IBaseSession : IPacketReceiver, IDisposable
 	{
+		/// <summary>
+		/// Server instance that owns this session.
+		/// </summary>
 		IBaseServer ServerRef { get; }
 
 		/// <summary>
-		/// Session Id
+		/// Id in string
 		/// </summary>
-		Guid Id { get; }
-
 		string IdStr { get; }
 
 		/// <summary>
@@ -85,8 +86,22 @@ namespace NetCoreServer
 		/// Option: send buffer size
 		/// </summary>
 		int OptionSendBufferSize { get; }
-
+		/// <summary>
+		/// Is socket connected
+		/// </summary>
 		bool IsConnected { get; }
+		/// <summary>
+		/// Timestamp when the connection was established.
+		/// </summary>
+		long ConnectedAt { get; }
+		/// <summary>
+		/// Timestamp when the last packet was sent.
+		/// </summary>
+		long LastPacketSentAt { get; }
+		/// <summary>
+		/// Timestamp when the last packet was received.
+		/// </summary>
+		long LastPacketReceivedAt { get; }
 
 		#region Connect/Disconnect session
 		void Connect(Socket socket);
