@@ -173,6 +173,9 @@ namespace NetCoreServer
 		/// </summary>
 		public int OptionSendBufferSize { get; set; } = 8192;
 
+		public (long, long) SendBufferCapacity { get { return (_sendBufferMain.Capacity, _sendBufferFlush.Capacity); } }
+		public long ReceiveBufferCapacity { get { return _receiveBuffer.Capacity; } }
+
 		private readonly Buffer m_IPacketReceiver_ReceivedBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
 		private readonly Buffer m_IPacketReceiver_IntermediateBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
 		private readonly Buffer m_IPacketReceiver_ProcessBuffer = new Buffer(8192); //Initial size 8KB, will grow as needed.
