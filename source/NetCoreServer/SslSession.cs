@@ -787,16 +787,19 @@ namespace NetCoreServer
 					// If the receive buffer is full increase its size
 					if (_receiveBuffer.Capacity == size)
 					{
-						// Check the receive buffer limit
-						if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
+						if (OptionReceiveBufferLimit > 0)
 						{
-							//SendError(SocketError.NoBufferSpaceAvailable);
-							//Disconnect($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
-							Logger.Warning($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
-							return;
+							// Check the receive buffer limit
+							if ((2 * size) < OptionReceiveBufferLimit)
+							{
+								//SendError(SocketError.NoBufferSpaceAvailable);
+								//Disconnect($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
+								//Logger.Warning($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
+								_receiveBuffer.Reserve(2 * size);
+							}
 						}
-
-						_receiveBuffer.Reserve(2 * size);
+						else
+							_receiveBuffer.Reserve(2 * size);
 					}
 				}
 
