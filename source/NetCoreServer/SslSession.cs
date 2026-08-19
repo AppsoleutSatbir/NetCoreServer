@@ -790,8 +790,9 @@ namespace NetCoreServer
 						// Check the receive buffer limit
 						if (((2 * size) > OptionReceiveBufferLimit) && (OptionReceiveBufferLimit > 0))
 						{
-							SendError(SocketError.NoBufferSpaceAvailable);
-							Disconnect($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
+							//SendError(SocketError.NoBufferSpaceAvailable);
+							//Disconnect($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
+							Logger.Warning($"SSLSession::ProcessReceive::ReceiveBufferLimitReached.size:{size},OptionReceiveBufferLimit:{OptionReceiveBufferLimit}");
 							return;
 						}
 
