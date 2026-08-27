@@ -969,4 +969,12 @@ namespace AC.NetCoreServer.Logging
 		//     Object positionally formatted into the message template.
 		void Warning<T>(string messageTemplate, T propertyValue);
 	}
+
+	public static class ELogLevelExtension
+	{
+		public static bool IsEnabled(this ELogLevel _logLevel, ELogLevel a_logLevel)
+		{
+			return a_logLevel >= _logLevel;
+		}
+	}
 }
