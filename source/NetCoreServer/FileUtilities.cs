@@ -7,7 +7,7 @@ namespace NetCoreServer;
 
 public static class FileUtilities
 {
-	private const string FATAL_FILE_PATH = "../FatalErrors/{FOLDER_DATE}/{FILE_DATE}.log";
+	private const string FATAL_FILE_PATH = "../Logs/FatalErrors/{FOLDER_DATE}/{FILE_DATE}.log";
 
 	private static readonly Channel<string> m_channel = Channel.CreateUnbounded<string>(
 		new UnboundedChannelOptions
