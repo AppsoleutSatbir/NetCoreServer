@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AC.NetCoreServer.Logging
 {
@@ -45,6 +46,32 @@ namespace AC.NetCoreServer.Logging
 
 	public interface ILogger : IDisposable
 	{
+		/// <summary>
+		/// Create a logger that enriches log events with the specified property.
+		/// </summary>
+		/// <param name="propertyName">The name of the property. Must be non-empty.</param>
+		/// <param name="value">The property value.</param>
+		/// <param name="destructureObjects">If <see langword="true"/>, the value will be serialized as a structured
+		/// object if possible; if <see langword="false"/>, the object will be recorded as a scalar or simple array.</param>
+		/// <returns>A logger that will enrich log events as specified.</returns>
+		ILogger ForContext(string propertyName, object? value, bool destructureObjects = false);
+
+		/// <summary>
+		/// Create a logger that marks log events as being from the specified
+		/// source type.
+		/// </summary>
+		/// <typeparam name="TSource">Type generating log messages in the context.</typeparam>
+		/// <returns>A logger that will enrich log events as specified.</returns>
+		ILogger ForContext<TSource>();
+
+		/// <summary>
+		/// Create a logger that marks log events as being from the specified
+		/// source type.
+		/// </summary>
+		/// <param name="source">Type generating log messages in the context.</param>
+		/// <returns>A logger that will enrich log events as specified.</returns>
+		ILogger ForContext(Type source);
+
 		void FlushLogs();
 
 		bool IsEnabled(ELogLevel a_logLevel);
