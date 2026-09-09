@@ -138,7 +138,7 @@ namespace NetCoreServer
         {
             try
             {
-                Logger.Information("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
+                Logger.Debug("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
                 if (!IsConnected)
                     return false;
 
@@ -335,7 +335,7 @@ namespace NetCoreServer
         {
             try
             {
-                Logger.Information("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
+                Logger.Debug("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
                 if (!IsConnected)
                     return false;
 
