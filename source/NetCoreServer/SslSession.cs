@@ -143,7 +143,7 @@ namespace NetCoreServer
 				if (Logger == null)
 					Console.WriteLine("SSlSession:Disconnect:[{0}]::Marker:{1}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
 				else
-					Logger.Information("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
+					Logger.Debug("SSlSession:Disconnect:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
 
 				if (!IsConnected)
 					return false;
@@ -169,7 +169,12 @@ namespace NetCoreServer
 					try
 					{
 						// Shutdown the SSL stream
-						_sslStream.ShutdownAsync().Wait();
+						Task l_sslShutdown = _sslStream.ShutdownAsync();
+						if (!l_sslShutdown.Wait(250))
+						{
+							// Dispose() below faults the pending write - observe it so it isn't unobserved.
+							_ = l_sslShutdown.ContinueWith(static t => _ = t.Exception, TaskContinuationOptions.OnlyOnFaulted);
+						}
 					}
 					catch (Exception a_ex)
 					{
@@ -352,7 +357,7 @@ namespace NetCoreServer
 		{
 			try
 			{
-				Logger.Information("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
+				Logger.Debug("SSlSession:DisconnectAsync:[{SessionId}]::Marker:{Marker}", (_sslStreamId == null ? "null" : _sslStreamId.ToString()), a_marker);
 				if (!IsConnected)
 					return false;
 
@@ -374,7 +379,7 @@ namespace NetCoreServer
 					try
 					{
 						// Shutdown the SSL stream
-						_sslStream.ShutdownAsync().Wait();
+						await _sslStream.ShutdownAsync();
 					}
 					catch (Exception a_ex)
 					{
