@@ -102,6 +102,7 @@ namespace NetCoreServer
 		/// Timestamp when the last packet was received.
 		/// </summary>
 		long LastPacketReceivedAt { get; }
+		bool IsCustomHandshakeCompleted { get; set; }
 
 		#region Connect/Disconnect session
 		void Connect(Socket socket);

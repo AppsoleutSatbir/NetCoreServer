@@ -358,6 +358,7 @@ namespace NetCoreServer
 		/// Session socket disposed flag
 		/// </summary>
 		public bool IsSocketDisposed { get; protected set; } = true;
+		public bool IsCustomHandshakeCompleted { get; set; } = false;
 
 		// Implement IDisposable.
 		public void Dispose()
