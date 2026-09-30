@@ -191,7 +191,7 @@ namespace NetCoreServer
 		private SocketAsyncEventArgs _connectEventArg;
 		private SslStream _sslStream;
 		private Guid? _sslStreamId;
-
+		public bool IsCustomHandshakeCompleted = false;
 		/// <summary>
 		/// Is the client connecting?
 		/// </summary>
