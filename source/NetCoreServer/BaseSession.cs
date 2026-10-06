@@ -340,7 +340,7 @@ namespace NetCoreServer
 				return;
 
 			if (a_ex != null && Logger != null)
-				Logger.Error(a_ex);
+				Logger.Error(a_ex, "SocketError:{SocketError}", error);
 
 			OnError(error, a_ex);
 		}
